@@ -15,9 +15,15 @@ namespace BladeLabs.UnitySDK
 {
     public class BladeSDK
     {
-        private static Engine engine;
+        private Engine engine;
+        private string executeApiEndpoint;
+        private string network;
 
-        public BladeSDK() {
+        public BladeSDK(string network = "testnet", string executeApiEndpoint = "http://localhost:8443/signer/tx") {
+            
+            this.network = network;
+            this.executeApiEndpoint = executeApiEndpoint;
+
             engine = new Engine();
             engine.SetValue("console",typeof(Debug));
             engine.Execute("window = {};");
@@ -25,18 +31,7 @@ namespace BladeLabs.UnitySDK
             engine.SetValue("setTimeout", new Action<Action<int>, int>(setTimeout));
             engine.SetValue("CXMLHttpRequest", typeof(CXMLHTTPRequest));
 
-// "Packages/com.unity.images-library/Example/Images/image.png"
-
-// ...
-string absolutePath =   Path.GetFullPath("Packages/io.bladelabs.unity-sdk/Resources/JSWrapper.bundle.js");
-            
-            
-Debug.Log(absolutePath);
-Debug.Log(Application.dataPath);
-
-
-
-            // var source = new StreamReader(Application.dataPath + "/Resources/" + "JSWrapper.bundle.js");
+            string absolutePath = Path.GetFullPath("Packages/io.bladelabs.unity-sdk/Resources/JSWrapper.bundle.js");
             var source = new StreamReader(absolutePath);
             string script = source.ReadToEnd();
             source.Close();
@@ -50,28 +45,24 @@ Debug.Log(Application.dataPath);
                 .UnwrapIfPromise()
                 .ToString();
             
-            // send tx
-
             Debug.Log(tx);
 
-            // var responseValue = await executeTx(tx, "testnet");
-            // if (responseValue.status != null) {
-            //     Debug.Log(responseValue.status);
-            // } else {
-            //     Debug.Log("FAIL");
-            // }
-            // return responseValue.status == "SUCCESS";
-
-            return false;
+            var responseValue = await executeTx(tx, this.network);
+            if (responseValue.status != null) {
+                Debug.Log(responseValue.status);
+            } else {
+                Debug.Log("FAIL");
+            }
+            return responseValue.status == "SUCCESS";
         }
 
-        static async Task<ResponseObject> executeTx(string tx, string network)
+        async Task<ResponseObject> executeTx(string tx, string network)
         {
             using (HttpClient client = new HttpClient())
             {
                 string jsonPayload = "{\"tx\": \"" + tx + "\", \"network\": \"" + network + "\"}";
                 HttpContent content = new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync("http://localhost:8443/signer/tx", content);
+                HttpResponseMessage response = await client.PostAsync(this.executeApiEndpoint, content);
 
 
                 if (response.IsSuccessStatusCode) {
