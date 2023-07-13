@@ -1,0 +1,32 @@
+{
+  "name": "io.bladelabs.unity-sdk",
+  "displayName": "Unity Blade SDK",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "description": "Hedera SDK wrapper with Blade features",
+  "unity": "2019.3",
+  "documentationUrl": "https://github.com/Blade-Labs/unity-blade/blob/develop/README.md",
+  "keywords": [
+    "hedera",
+    "hashgraph",
+    "sdk",
+    "bladelabs",
+    "bladewallet"
+  ],
+  "author": {
+    "name": "BladeLabs",
+    "url": "https://bladelabs.io/"
+  },
+  "homepage": "https://bladelabs.io/",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:Blade-Labs/unity-blade.git"
+  },
+  "samples": [
+    {
+      "displayName": "Example Blade usage",
+      "description": "Contains an example for running BladeSDK with init and transfer HBARs",
+      "path": "Samples~/Sample1"
+    }
+  ]
+}
