@@ -4,8 +4,6 @@ using UnityEngine;
 using System;
 using System.IO;
 using System.Net.Http;
-// using System.Text.Json;
-// using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Timers;
@@ -29,7 +27,6 @@ namespace BladeLabs.UnitySDK
             engine.Execute("window = {};");
             engine.Execute("global = {};");
             engine.SetValue("setTimeout", new Action<Action<int>, int>(setTimeout));
-            engine.SetValue("CXMLHttpRequest", typeof(CXMLHTTPRequest));
 
             string absolutePath = Path.GetFullPath("Packages/io.bladelabs.unity-sdk/Resources/JSUnityWrapper.bundle.js");            
             var source = new StreamReader(absolutePath);
@@ -40,20 +37,36 @@ namespace BladeLabs.UnitySDK
         
         public async Task<bool> transferHbars(string accountId, string accountPrivateKey, string recieverAccount, string amount, string memo) {
             
-            string tx = engine
-                .Evaluate($"window.bladeSdk.transferHbars('{accountId}', '{accountPrivateKey}', '{recieverAccount}', '{amount}', '{memo}', 'transferHbars1')")
+            string response = engine
+                .Evaluate($"window.bladeSdk.transferHbars('{accountId}', '{accountPrivateKey}', '{recieverAccount}', '{amount}', '{memo}')")
                 .UnwrapIfPromise()
                 .ToString();
-            
-            Debug.Log(tx);
 
-            var responseValue = await executeTx(tx, this.network);
+            SignedTx signedTx = this.processResponse<SignedTx>(response);
+            
+            var responseValue = await executeTx(signedTx.tx, signedTx.network);
             if (responseValue.status != null) {
                 Debug.Log(responseValue.status);
             } else {
                 Debug.Log("FAIL");
             }
             return responseValue.status == "SUCCESS";
+        }
+
+
+        private T processResponse<T>(string rawJson) {
+            Debug.Log(rawJson);
+
+            Response<T> response = JsonUtility.FromJson<Response<T>>(rawJson);
+            T data = (T)response.data;
+            BladeJSError error = (BladeJSError)response.error;
+
+            if (error.name != null || error.reason != null) {
+                Debug.Log($"throwing BladeSDKException({error.name}, {error.reason})");
+                throw new BladeSDKException(error.name, error.reason);
+            }
+
+            return data;
         }
 
         async Task<ResponseObject> executeTx(string tx, string network)
@@ -83,151 +96,8 @@ namespace BladeLabs.UnitySDK
 
         void setTimeout(Action<int> callback, int delay)
         {
+            Debug.Log("Warning setTimeout use. Try to avoid");
             Task.Delay(delay).ContinueWith(_ => callback(delay));
         }
-    }
-
-    public class CXMLHTTPRequest
-    {
-        private HttpClient client;
-        private HttpRequestMessage request;
-        private HttpResponseMessage response;
-        private Action onReadyStateChange;
-        private Action<string> onLoad;
-        private Action onError;
-
-        private bool isPolling;
-        private string requestId = "";
-
-        public CXMLHTTPRequest()
-        {
-            client = new HttpClient();
-            request = new HttpRequestMessage();
-            isPolling = false;
-        }
-
-        public void open(string method, string url, bool async = true)
-        {
-            request.Method = new HttpMethod(method);
-            request.RequestUri = new Uri(url);
-        }
-
-        public void send(string bodyInit = "", string _requestId = "")
-        {
-            requestId = _requestId;
-            response = client.SendAsync(request).GetAwaiter().GetResult();
-            StartPolling();
-        }
-
-        private async void StartPolling()
-        {
-            int delay = 100;
-            int timeout = 30000;
-            isPolling = true;
-            while (isPolling)
-            {
-                await Task.Delay(delay); // Adjust the polling interval as needed
-                timeout -= delay;
-                if ((int)(response?.StatusCode ?? 0) > 0) {
-
-                    Debug.Log("response code: " + response?.StatusCode);
-
-                    isPolling = false;
-
-                    Debug.Log("onLoad?: " + onLoad);
-
-                    onReadyStateChange?.Invoke();
-                    onLoad?.Invoke(requestId);
-                }
-
-                // TODO on error
-
-                if (timeout <= 0) {
-                    // onTimeout?.Invoke();
-                    // onAbort?.Invoke();
-                }
-                
-            }
-        }
-
-        public void abort()
-        {
-            isPolling = false;
-            request.Dispose();
-            // onAbort?.Invoke();
-        }
-
-        public string getAllResponseHeaders() {
-            return "";
-        }
-
-        public string responseText
-        {
-            get
-            {
-                return response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-            }
-        }
-
-        public int status
-        {
-            get
-            {
-                return (int)(response?.StatusCode ?? 0);
-            }
-        }
-
-        public int readyState
-        {
-            get
-            {
-                return isPolling ? 3 : 4;
-            }
-        }
-
-        public Action onreadystatechange
-        {
-            get
-            {
-                return onReadyStateChange;
-            }
-            set
-            {
-                Debug.Log("onreadystatechange set");
-                onReadyStateChange = value;
-            }
-        }
-
-        public Action<string> onload
-        {
-            get
-            {
-                return onLoad;
-            }
-            set
-            {
-                Debug.Log("onload set");
-                onLoad = value;
-            }
-        }
-
-        public Action onerror
-        {
-            get
-            {
-                return onError;
-            }
-            set
-            {
-                Debug.Log("onerror set");
-                onError = value;
-            }
-        }
-    }
-
-    [Serializable]
-    public struct ResponseObject
-    {
-        public string status;
     }
 }
