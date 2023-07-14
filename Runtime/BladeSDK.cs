@@ -31,7 +31,7 @@ namespace BladeLabs.UnitySDK
             engine.SetValue("setTimeout", new Action<Action<int>, int>(setTimeout));
             engine.SetValue("CXMLHttpRequest", typeof(CXMLHTTPRequest));
 
-            string absolutePath = Path.GetFullPath("Packages/io.bladelabs.unity-sdk/Resources/JSWrapper.bundle.js");
+            string absolutePath = Path.GetFullPath("Packages/io.bladelabs.unity-sdk/Resources/JSUnityWrapper.bundle.js");            
             var source = new StreamReader(absolutePath);
             string script = source.ReadToEnd();
             source.Close();
