@@ -44,7 +44,7 @@ namespace BladeLabs.UnitySDK
 
             SignedTx signedTx = this.processResponse<SignedTx>(response);
             
-            var responseValue = await executeTx(signedTx.tx, signedTx.network);
+            ExecuteTxReceipt responseValue = await executeTx(signedTx.tx, signedTx.network);
             if (responseValue.status != null) {
                 Debug.Log(responseValue.status);
             } else {
@@ -69,26 +69,29 @@ namespace BladeLabs.UnitySDK
             return data;
         }
 
-        async Task<ResponseObject> executeTx(string tx, string network)
+        async Task<ExecuteTxReceipt> executeTx(string tx, string network)
         {
             using (HttpClient client = new HttpClient())
             {
-                string jsonPayload = "{\"tx\": \"" + tx + "\", \"network\": \"" + network + "\"}";
-                HttpContent content = new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync(this.executeApiEndpoint, content);
+                try {
+                    ExecuteTxRequest request = new ExecuteTxRequest {
+                        tx = tx,
+                        network = network
+                    };
+                    string body = JsonUtility.ToJson(request);
+                    HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PostAsync(this.executeApiEndpoint, bodyContent);
 
-
-                if (response.IsSuccessStatusCode) {
-
-                    string jsonResponse = await response.Content.ReadAsStringAsync();
-                    // var responseObject = JsonSerializer.Deserialize<ResponseObject>(jsonResponse);
-                    var responseObject = JsonUtility.FromJson<ResponseObject>(jsonResponse);
-                    return responseObject;
-                } else {
-                    Console.WriteLine($"HTTP Request Error: {response.StatusCode}");
-
-                    var responseObject = JsonUtility.FromJson<ResponseObject>("{}");
-                    return responseObject;
+                    string content = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode) {
+                        Debug.Log(content);
+                        var responseObject = JsonUtility.FromJson<ExecuteTxReceipt>(content);
+                        return responseObject;
+                    } else {
+                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
+                    }
+                } catch (HttpRequestException ex) {
+                    throw new BladeSDKException($"HttpRequestException", ex.Message);
                 }
             }
         }
