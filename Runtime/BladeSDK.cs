@@ -55,6 +55,34 @@ namespace BladeLabs.UnitySDK
             };
         }
 
+        // TODO: contractCallFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, completionKey?: string): Promise<Partial<TransactionReceipt>>
+        // TODO: contractCallQueryFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, resultTypes: string[]): Promise<ContractCallQueryRecord[]>
+        // TODO: transferTokens(tokenId: string, accountId: string, accountPrivateKey: string, receiverID: string, amount: string, memo: string, freeTransfer: boolean = false, completionKey?: string): Promise<TransactionResponse> {
+        // TODO: createAccount(deviceId?: string, completionKey?: string): Promise<CreateAccountData>
+        // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
+        // TODO: deleteAccount(deleteAccountId: string, deletePrivateKey: string, transferAccountId: string, operatorAccountId: string, operatorPrivateKey: string, completionKey?: string): Promise<TransactionReceipt>
+
+        public async Task<AccountInfoData> getAccountInfo(string accountId) {
+            var account = await apiService.getAccount(accountId);
+            string response = engine
+                .Evaluate($"window.bladeSdk.getAccountInfo('{accountId}', '{account.evm_address}', '{account.key.key}')")
+                .UnwrapIfPromise()
+                .ToString();
+
+            return this.processResponse<AccountInfoData>(response);
+        }
+
+        // TODO: getKeysFromMnemonic(mnemonicRaw: string, lookupNames: boolean, completionKey?: string): Promise<PrivateKeyData> {
+        // TODO: sign(messageString: string, privateKey: string, completionKey?: string): Promise<SignMessageData> {
+        // TODO: signVerify(messageString: string, signature: string, publicKey: string, completionKey?: string): Promise<SignVerifyMessageData> {
+        // TODO: hethersSign(messageString: string, privateKey: string, completionKey?: string): Promise<SignMessageData>
+        // TODO: splitSignature(signature: string, completionKey?: string): Promise<SplitSignatureData> {
+        // TODO: async getParamsSignature(paramsEncoded: string | ParametersBuilder, privateKey: string, completionKey?: string): Promise<SplitSignatureData> {
+        // TODO: getTransactions(accountId: string, transactionType: string = "", nextPage: string, transactionsLimit: string = "10", completionKey?: string): Promise<TransactionsHistoryData> {
+        // TODO: getC14url(asset: string, account: string, amount: string, completionKey?: string): Promise<IntegrationUrlData> {
+
+
+
         public async Task<AccountBalanceData> getBalance(string accountId) {
             return await apiService.getBalance(accountId);
         }

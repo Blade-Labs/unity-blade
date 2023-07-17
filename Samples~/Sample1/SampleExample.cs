@@ -25,7 +25,12 @@ namespace BladeLabs.UnitySDK.Samples
 
 
             // get info
-            Debug.Log(await bladeSdk.getInfo());
+            // Debug.Log(await bladeSdk.getInfo());
+
+            // get account info
+            Debug.Log(await bladeSdk.getAccountInfo("0.0.8235"));
+
+            
         }
     }
 }

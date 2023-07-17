@@ -17,6 +17,18 @@ namespace BladeLabs.UnitySDK {
     }
 
     [Serializable]
+    public class AccountInfoData {
+        public string accountId;
+        public string evmAddress;
+        public string calculatedEvmAddress;
+                
+        public override string ToString() {
+            return $@"{{accountId = {accountId}, evmAddress = {evmAddress}, calculatedEvmAddress = {calculatedEvmAddress}}}";
+        }
+    }
+
+
+    [Serializable]
     public struct ExecuteTxReceipt {
         public string status;
         public string accountId;
