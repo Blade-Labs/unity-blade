@@ -44,6 +44,17 @@ namespace BladeLabs.UnitySDK
             engine.Execute(script);
         }
 
+        public async Task<InfoData> getInfo() {
+            return new InfoData {
+                apiKey = this.apiKey,
+                dAppCode = this.dAppCode,
+                network = this.network,
+                visitorId = "[not implemented yet]",
+                sdkEnvironment = this.sdkEnvironment,
+                sdkVersion = this.sdkVersion
+            };
+        }
+
         public async Task<AccountBalanceData> getBalance(string accountId) {
             return await apiService.getBalance(accountId);
         }

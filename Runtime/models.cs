@@ -2,6 +2,19 @@ using System;
 using System.Collections.Generic;
 
 namespace BladeLabs.UnitySDK {
+    [Serializable]
+    public class InfoData {
+        public string apiKey;
+        public string dAppCode;
+        public Network network;
+        public string visitorId;
+        public SdkEnvironment sdkEnvironment;
+        public string sdkVersion;
+        
+        public override string ToString() {
+            return $@"{{apiKey = {apiKey}, dAppCode = {dAppCode}, network = {network}, visitorId = {visitorId}, sdkEnvironment = {sdkEnvironment}, sdkVersion = {sdkVersion}}}";
+        }
+    }
 
     [Serializable]
     public struct ExecuteTxReceipt {
@@ -156,17 +169,5 @@ namespace BladeLabs.UnitySDK {
         public override string ToString() {
             return $@"{{tokens = [{string.Join(", ", tokens)}], links = {links}}}";
         }
-    }
-
-    [Serializable]
-    public class InfoData {
-        // temporary
-        public string apiKey;
-        public string dAppCode;
-        public string network;
-        public string visitorId;
-        public string sdkEnvironment;
-        public string sdkVersion;
-        public int nonce;
     }
 }
