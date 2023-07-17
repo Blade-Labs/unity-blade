@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Generic;
 
-namespace BladeLabs.UnitySDK
-{
+namespace BladeLabs.UnitySDK {
+
     [Serializable]
-    public struct ExecuteTxReceipt
-    {
+    public struct ExecuteTxReceipt {
         public string status;
         public string accountId;
         public string fileId;
@@ -32,8 +32,7 @@ namespace BladeLabs.UnitySDK
     }
 
     [Serializable]
-    public class Long
-    {
+    public class Long {
         public uint low;
         public uint high;
         public bool unsigned;
@@ -44,8 +43,7 @@ namespace BladeLabs.UnitySDK
     }
 
     [Serializable]
-    public class ExchangeRate
-    {
+    public class ExchangeRate {
         public int hbars;
         public int cents;
         public string expirationTime;
@@ -56,41 +54,112 @@ namespace BladeLabs.UnitySDK
         }
     }
 
-
-
     [Serializable]
-    public class BladeJSError
-    {
+    public class BladeJSError {
         public string name;
         public string reason;
     }
 
     [Serializable]
-    public class Response<T>
-    {
+    public class Response<T> {
         // public string completionKey;
         public T data;
         public BladeJSError error;
     }
 
     [Serializable]
-    public class SignedTx
-    {
+    public class SignedTx {
         public string tx;
         public string network;
     }
 
     [Serializable]
-    public class ExecuteTxRequest
-    {
+    public class ExecuteTxRequest {
         public string tx;
         public string network;
     }
 
+    
+    [Serializable]
+    public class AccountData {
+        public string account;
+        public string alias;
+        public ulong auto_renew_period;
+        public AccountBalanceData balance;
+        public string created_timestamp;
+        public bool decline_reward;
+        public bool deleted;
+        public ulong ethereum_nonce;
+        public string evm_address;
+        public string expiry_timestamp;
+        public AccountKeyData key;
+        public PaginationLink links;
+        public ulong max_automatic_token_associations;
+        public string memo;
+        public ulong pending_reward;
+        public bool receiver_sig_required;
+        public string stake_period_start;
+        public string staked_account_id;
+        public string staked_node_id;
+        public string[] transactions; /////
+
+        public override string ToString() {
+            return $@"{{account = {account}, alias = {alias}, balance = {balance}, evm_address = {evm_address}, key = {key}, memo = {memo}, transactions = {transactions}}}";
+        }
+    }
 
     [Serializable]
-    public class InfoData
-    {
+    public class AccountKeyData {
+        public string key;
+        public string _type;
+    
+        public override string ToString() {
+            return $@"{{key = {key}, _type = {_type}}}";
+        }
+    }
+
+    [Serializable]
+    public class AccountBalanceData {
+        public long balance;
+        public string timestamp;
+        public List<TokenBalance> tokens;
+
+        public override string ToString() {
+            return $@"{{balance = {balance}, timestamp = {timestamp}, tokens = [{string.Join<TokenBalance>(", ", tokens)}]}}";
+        }
+    }
+
+    [Serializable]
+    public class TokenBalance {
+        public string token_id;
+        public ulong balance;
+
+        public override string ToString() {
+            return $@"{{token_id = {token_id}, balance = {balance}}}";
+        }
+    }
+
+    [Serializable]
+    public class PaginationLink {
+        public string next;
+
+        public override string ToString() {
+            return $@"{{next = {next}}}";
+        }
+    }
+
+    [Serializable]
+    public class BalanceDataResponse {
+        public List<TokenBalance> tokens;
+        public PaginationLink links;
+
+        public override string ToString() {
+            return $@"{{tokens = [{string.Join(", ", tokens)}], links = {links}}}";
+        }
+    }
+
+    [Serializable]
+    public class InfoData {
         // temporary
         public string apiKey;
         public string dAppCode;
@@ -100,26 +169,4 @@ namespace BladeLabs.UnitySDK
         public string sdkVersion;
         public int nonce;
     }
-
-    // [Serializable]
-    // public class BalanceResponse : Result<BalanceData>
-    // {
-    //     public string completionKey { get; set; }
-    //     public BalanceData data { get; set; }
-    // }
-
-    // [Serializable]
-    // public class BalanceData
-    // {
-    //     public double hbars;
-    //     public List<BalanceDataToken> tokens;
-    // }
-
-    // [Serializable]
-    // public class BalanceDataToken
-    // {
-    //     public double balance;
-    //     public string tokenId;
-    // }
-
 }

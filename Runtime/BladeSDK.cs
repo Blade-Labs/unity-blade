@@ -14,13 +14,22 @@ namespace BladeLabs.UnitySDK
     public class BladeSDK
     {
         private Engine engine;
+        ApiService apiService;
+        string apiKey;
+        private Network network = Network.Testnet;
+        string dAppCode;
+        private SdkEnvironment sdkEnvironment;
+        string sdkVersion = "Unity@0.6.0";
         private string executeApiEndpoint;
-        private string network;
-
-        public BladeSDK(string network = "testnet", string executeApiEndpoint = "http://localhost:8443/signer/tx") {
-            
+        
+        public BladeSDK(string apiKey, Network network, string dAppCode, SdkEnvironment sdkEnvironment, string executeApiEndpoint = "http://localhost:8443/signer/tx") {
+            this.apiKey = apiKey;
             this.network = network;
+            this.dAppCode = dAppCode;
+            this.sdkEnvironment = sdkEnvironment;
             this.executeApiEndpoint = executeApiEndpoint;
+
+            this.apiService = new ApiService(network, sdkEnvironment, executeApiEndpoint);
 
             engine = new Engine();
             engine.SetValue("console",typeof(Debug));
@@ -34,29 +43,23 @@ namespace BladeLabs.UnitySDK
             source.Close();
             engine.Execute(script);
         }
+
+        public async Task<AccountBalanceData> getBalance(string accountId) {
+            return await apiService.getBalance(accountId);
+        }
         
-        public async Task<bool> transferHbars(string accountId, string accountPrivateKey, string recieverAccount, string amount, string memo) {
-            
+        public async Task<ExecuteTxReceipt> transferHbars(string accountId, string accountPrivateKey, string recieverAccount, string amount, string memo) {
             string response = engine
                 .Evaluate($"window.bladeSdk.transferHbars('{accountId}', '{accountPrivateKey}', '{recieverAccount}', '{amount}', '{memo}')")
                 .UnwrapIfPromise()
                 .ToString();
 
             SignedTx signedTx = this.processResponse<SignedTx>(response);
-            
-            ExecuteTxReceipt responseValue = await executeTx(signedTx.tx, signedTx.network);
-            if (responseValue.status != null) {
-                Debug.Log(responseValue.status);
-            } else {
-                Debug.Log("FAIL");
-            }
-            return responseValue.status == "SUCCESS";
+            return await apiService.executeTx(signedTx.tx, signedTx.network);
         }
 
 
         private T processResponse<T>(string rawJson) {
-            Debug.Log(rawJson);
-
             Response<T> response = JsonUtility.FromJson<Response<T>>(rawJson);
             T data = (T)response.data;
             BladeJSError error = (BladeJSError)response.error;
@@ -69,38 +72,17 @@ namespace BladeLabs.UnitySDK
             return data;
         }
 
-        async Task<ExecuteTxReceipt> executeTx(string tx, string network)
-        {
-            using (HttpClient client = new HttpClient())
-            {
-                try {
-                    ExecuteTxRequest request = new ExecuteTxRequest {
-                        tx = tx,
-                        network = network
-                    };
-                    string body = JsonUtility.ToJson(request);
-                    HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await client.PostAsync(this.executeApiEndpoint, bodyContent);
-
-                    string content = await response.Content.ReadAsStringAsync();
-                    if (response.IsSuccessStatusCode) {
-                        Debug.Log(content);
-                        var responseObject = JsonUtility.FromJson<ExecuteTxReceipt>(content);
-                        return responseObject;
-                    } else {
-                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
-                    }
-                } catch (HttpRequestException ex) {
-                    throw new BladeSDKException($"HttpRequestException", ex.Message);
-                }
-            }
-        }
+        
 
 
         void setTimeout(Action<int> callback, int delay)
         {
             Debug.Log("Warning setTimeout use. Try to avoid");
             Task.Delay(delay).ContinueWith(_ => callback(delay));
+        }
+
+        ~BladeSDK() {
+            Debug.Log("~BladeSDK() dispose");
         }
     }
 }
