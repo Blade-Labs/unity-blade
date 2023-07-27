@@ -7,7 +7,7 @@ namespace BladeLabs.UnitySDK.Samples
     {
         async void Start()
         {
-            BladeSDK bladeSdk = new BladeSDK("apiKey", Network.Testnet, "dAppCode", SdkEnvironment.CI, "http://localhost:8443/signer/tx");
+            BladeSDK bladeSdk = new BladeSDK("ygUgCzRrsvhWmb3dsLcDpGnJpSZ4tk8hACmZqg9WngpuQYKdnD5m8FjfPV3XVUeB", Network.Testnet, "unitysdktest", SdkEnvironment.CI, "http://localhost:8443/signer/tx");
 
             // transfer hbars
             // Debug.Log(
@@ -28,9 +28,22 @@ namespace BladeLabs.UnitySDK.Samples
             // Debug.Log(await bladeSdk.getInfo());
 
             // get account info
-            Debug.Log(await bladeSdk.getAccountInfo("0.0.8235"));
+            // Debug.Log(await bladeSdk.getAccountInfo("0.0.8235"));
 
+            // transfer tokens
+            Debug.Log(
+                await bladeSdk.transferTokens(
+                    "0.0.4452096",
+                    "0.0.8172",
+                    "3030020100300706052b8104000a042204200ce23c3a1cc9b7cd85db5fdd039491cab3d95c0065ac18f77867d33eaff5c050",
+                    "0.0.8235",
+                     "0.12345678",
+                    "unity-sdk-token-transfer",
+                    true
+                )
+            );
             
+
         }
     }
 }

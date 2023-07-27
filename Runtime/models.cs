@@ -104,7 +104,29 @@ namespace BladeLabs.UnitySDK {
         public string network;
     }
 
+    [Serializable]
+    public class FreeTokenTransferRequest {
+        public string receiverAccountId;
+        public string senderAccountId;
+        public double amount;
+        public int? decimals;
+        public string memo;
+    };
+
+    [Serializable]
+    public class FreeTokenTransferResponse {
+        public string transactionBytes;
+    }
     
+    [Serializable]
+    public class TVTEResponse {
+        public string tvte;
+
+        public override string ToString() {
+            return $@"{{tvte = {tvte}}}";
+        }
+    }
+
     [Serializable]
     public class AccountData {
         public string account;
@@ -117,7 +139,7 @@ namespace BladeLabs.UnitySDK {
         public ulong ethereum_nonce;
         public string evm_address;
         public string expiry_timestamp;
-        public AccountKeyData key;
+        public KeyData key;
         public PaginationLink links;
         public ulong max_automatic_token_associations;
         public string memo;
@@ -134,7 +156,47 @@ namespace BladeLabs.UnitySDK {
     }
 
     [Serializable]
-    public class AccountKeyData {
+    public class TokenData {
+        public string name;
+        public string token_id;
+        public string symbol;
+        public string decimals;
+        public string memo;
+        public string auto_renew_account;
+        public ulong auto_renew_period;
+        public string created_timestamp;
+        // custom_fees":{
+        //     "created_timestamp":"1678732798.485340406",
+        //     "fixed_fees":[],
+        //     "fractional_fees":[]
+        // },
+        
+        public bool deleted;
+        public ulong expiry_timestamp;
+        public KeyData admin_key;
+        public KeyData fee_schedule_key;
+        public KeyData freeze_key;
+        public KeyData kyc_key;
+        public KeyData pause_key;
+        public KeyData supply_key;
+        public KeyData wipe_key;
+        public bool freeze_default;
+        public string initial_supply;
+        public string max_supply;
+        public string modified_timestamp;
+        public string pause_status;
+        public string supply_type;
+        public string total_supply;
+        public string treasury_account_id;
+        public string type;
+
+        public override string ToString() {
+            return $@"{{token_id = {token_id}, name = {name}, symbol = {symbol}, decimals = {decimals}}}";
+        }
+    }
+
+    [Serializable]
+    public class KeyData {
         public string key;
         public string _type;
     

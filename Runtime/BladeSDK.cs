@@ -29,13 +29,11 @@ namespace BladeLabs.UnitySDK
             this.sdkEnvironment = sdkEnvironment;
             this.executeApiEndpoint = executeApiEndpoint;
 
-            this.apiService = new ApiService(network, sdkEnvironment, executeApiEndpoint);
+            this.apiService = new ApiService(network, sdkEnvironment, executeApiEndpoint, dAppCode);
 
             engine = new Engine();
             engine.SetValue("console",typeof(Debug));
             engine.Execute("window = {};");
-            engine.Execute("global = {};");
-            engine.SetValue("setTimeout", new Action<Action<int>, int>(setTimeout));
 
             string absolutePath = Path.GetFullPath("Packages/io.bladelabs.unity-sdk/Resources/JSUnityWrapper.bundle.js");            
             var source = new StreamReader(absolutePath);
@@ -55,9 +53,41 @@ namespace BladeLabs.UnitySDK
             };
         }
 
+        public async Task<ExecuteTxReceipt> transferTokens(string tokenId, string accountId, string accountPrivateKey, string recieverAccount, string amount, string memo, bool freeTransfer = false) {
+            TokenData meta = await apiService.requestTokenInfo(tokenId);
+            double correctedAmount = double.Parse(amount) * Math.Pow(10, int.Parse(meta.decimals));
+            
+            if (freeTransfer == true) {
+                
+                // WIP 
+                // TODO send request to BladeApi
+
+                string response = engine
+                    .Evaluate($"window.bladeSdk.getTvteValue()")
+                    .UnwrapIfPromise()
+                    .ToString();
+
+                TVTEResponse tvteResponse = this.processResponse<TVTEResponse>(response);
+                Debug.Log(tvteResponse);
+
+
+                // FreeTokenTransferResponse response = await apiService.freeTokenTransfer(accountId, recieverAccount, correctedAmount, memo, xTvteApiToken);
+                throw new BladeSDKException("STOP", "EXEC");
+            } else {
+                string response = engine
+                    .Evaluate($"window.bladeSdk.transferTokens('{tokenId}', '{accountId}', '{accountPrivateKey}', '{recieverAccount}', {correctedAmount}, '{memo}', {freeTransfer.ToString().ToLower()})")
+                    .UnwrapIfPromise()
+                    .ToString();
+
+                SignedTx signedTx = this.processResponse<SignedTx>(response);
+                return await apiService.executeTx(signedTx.tx, signedTx.network);
+            }
+        }
+
+
         // TODO: contractCallFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, completionKey?: string): Promise<Partial<TransactionReceipt>>
         // TODO: contractCallQueryFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, resultTypes: string[]): Promise<ContractCallQueryRecord[]>
-        // TODO: transferTokens(tokenId: string, accountId: string, accountPrivateKey: string, receiverID: string, amount: string, memo: string, freeTransfer: boolean = false, completionKey?: string): Promise<TransactionResponse> {
+        // WIP: transferTokens(tokenId: string, accountId: string, accountPrivateKey: string, receiverID: string, amount: string, memo: string, freeTransfer: boolean = false, completionKey?: string): Promise<TransactionResponse> {
         // TODO: createAccount(deviceId?: string, completionKey?: string): Promise<CreateAccountData>
         // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
         // TODO: deleteAccount(deleteAccountId: string, deletePrivateKey: string, transferAccountId: string, operatorAccountId: string, operatorPrivateKey: string, completionKey?: string): Promise<TransactionReceipt>
@@ -72,7 +102,7 @@ namespace BladeLabs.UnitySDK
             return this.processResponse<AccountInfoData>(response);
         }
 
-        // TODO: getKeysFromMnemonic(mnemonicRaw: string, lookupNames: boolean, completionKey?: string): Promise<PrivateKeyData> {
+        // TODO ## Mnemonic problems ##: getKeysFromMnemonic(mnemonicRaw: string, lookupNames: boolean, completionKey?: string): Promise<PrivateKeyData> {
         // TODO: sign(messageString: string, privateKey: string, completionKey?: string): Promise<SignMessageData> {
         // TODO: signVerify(messageString: string, signature: string, publicKey: string, completionKey?: string): Promise<SignVerifyMessageData> {
         // TODO: hethersSign(messageString: string, privateKey: string, completionKey?: string): Promise<SignMessageData>
@@ -104,7 +134,7 @@ namespace BladeLabs.UnitySDK
             BladeJSError error = (BladeJSError)response.error;
 
             if (error.name != null || error.reason != null) {
-                Debug.Log($"throwing BladeSDKException({error.name}, {error.reason})");
+                Debug.Log($"processResponse() throwing BladeSDKException({error.name}, {error.reason})");
                 throw new BladeSDKException(error.name, error.reason);
             }
 
@@ -121,7 +151,7 @@ namespace BladeLabs.UnitySDK
         }
 
         ~BladeSDK() {
-            Debug.Log("~BladeSDK() dispose");
+            // Debug.Log("~BladeSDK() dispose");
         }
     }
 }
