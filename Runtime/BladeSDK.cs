@@ -40,6 +40,7 @@ namespace BladeLabs.UnitySDK
             string script = source.ReadToEnd();
             source.Close();
             engine.Execute(script);
+            engine.Execute($"window.bladeSdk.init('{apiKey}', '{network}', '{dAppCode}', '{sdkEnvironment}', '{sdkVersion}')");
         }
 
         public async Task<InfoData> getInfo() {
@@ -58,24 +59,33 @@ namespace BladeLabs.UnitySDK
             double correctedAmount = double.Parse(amount) * Math.Pow(10, int.Parse(meta.decimals));
             
             if (freeTransfer == true) {
-                
-                // WIP 
-                // TODO send request to BladeApi
+                // for free transfer BladeApi need to create TX, from our initial data.
+                // to call BladeApi we need TVTE-token                
+                // after we get transactionBytes need to sign it with sender private key
+                // after signing - need to execute this TX
 
+                // generating TVTE token
                 string response = engine
                     .Evaluate($"window.bladeSdk.getTvteValue()")
                     .UnwrapIfPromise()
                     .ToString();
-
                 TVTEResponse tvteResponse = this.processResponse<TVTEResponse>(response);
-                Debug.Log(tvteResponse);
 
+                // bladeApi create and sign TX, and return base64-encoded transactionBytes
+                FreeTokenTransferResponse freeTokenTransferResponse = await apiService.freeTokenTransfer(accountId, recieverAccount, correctedAmount, memo, tvteResponse.tvte);
 
-                // FreeTokenTransferResponse response = await apiService.freeTokenTransfer(accountId, recieverAccount, correctedAmount, memo, xTvteApiToken);
-                throw new BladeSDKException("STOP", "EXEC");
+                // sign with sender private key
+                string signedTxResponse = engine
+                    .Evaluate($"window.bladeSdk.signTransaction('{freeTokenTransferResponse.transactionBytes}', 'base64', '{accountPrivateKey}')")
+                    .UnwrapIfPromise()
+                    .ToString();
+                SignedTx signedTx = this.processResponse<SignedTx>(signedTxResponse);
+
+                //send tx to execution
+                return await apiService.executeTx(signedTx.tx, signedTx.network);
             } else {
                 string response = engine
-                    .Evaluate($"window.bladeSdk.transferTokens('{tokenId}', '{accountId}', '{accountPrivateKey}', '{recieverAccount}', {correctedAmount}, '{memo}', {freeTransfer.ToString().ToLower()})")
+                    .Evaluate($"window.bladeSdk.transferTokens('{tokenId}', '{accountId}', '{accountPrivateKey}', '{recieverAccount}', {correctedAmount}, '{memo}')")
                     .UnwrapIfPromise()
                     .ToString();
 

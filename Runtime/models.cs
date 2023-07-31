@@ -111,11 +111,19 @@ namespace BladeLabs.UnitySDK {
         public double amount;
         public int? decimals;
         public string memo;
+
+        public override string ToString() {
+            return $@"{{receiverAccountId = {receiverAccountId}, senderAccountId = {senderAccountId}, amount = {amount}, decimals = {decimals}, memo = {memo}}}";
+        }
     };
 
     [Serializable]
     public class FreeTokenTransferResponse {
         public string transactionBytes;
+
+        public override string ToString() {
+            return $@"{{transactionBytes = {transactionBytes}}}";
+        }
     }
     
     [Serializable]

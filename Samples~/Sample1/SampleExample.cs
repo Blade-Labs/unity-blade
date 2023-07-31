@@ -33,12 +33,12 @@ namespace BladeLabs.UnitySDK.Samples
             // transfer tokens
             Debug.Log(
                 await bladeSdk.transferTokens(
-                    "0.0.4452096",
-                    "0.0.8172",
-                    "3030020100300706052b8104000a042204200ce23c3a1cc9b7cd85db5fdd039491cab3d95c0065ac18f77867d33eaff5c050",
-                    "0.0.8235",
+                    "0.0.416487",
+                    "0.0.346533",
+                    "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b",
+                    "0.0.346530",
                      "0.12345678",
-                    "unity-sdk-token-transfer",
+                    "unity-sdk-free-token-transfer",
                     true
                 )
             );
