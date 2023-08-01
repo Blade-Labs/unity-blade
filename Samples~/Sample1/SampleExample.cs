@@ -21,28 +21,49 @@ namespace BladeLabs.UnitySDK.Samples
             // );
             
             // get balance
-            // Debug.Log(await bladeSdk.getBalance("0.0.8235"));
+            // Debug.Log(await bladeSdk.getBalance("0.0.346533"));
 
 
             // get info
             // Debug.Log(await bladeSdk.getInfo());
 
             // get account info
-            // Debug.Log(await bladeSdk.getAccountInfo("0.0.8235"));
+            // Debug.Log(await bladeSdk.getAccountInfo("0.0.346533"));
 
             // transfer tokens
-            Debug.Log(
-                await bladeSdk.transferTokens(
-                    "0.0.416487",
-                    "0.0.346533",
-                    "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b",
-                    "0.0.346530",
-                     "0.12345678",
-                    "unity-sdk-free-token-transfer",
-                    true
-                )
-            );
+            // Debug.Log(
+            //     await bladeSdk.transferTokens(
+            //         "0.0.416487",
+            //         "0.0.346533",
+            //         "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b",
+            //         "0.0.346530",
+            //          "0.12345678",
+            //         "unity-sdk-paid-token-transfer",
+            //         false
+            //     )
+            // );
+
+            // free transfer tokens
+            // Debug.Log(
+            //     await bladeSdk.transferTokens(
+            //         "0.0.416487",
+            //         "0.0.346533",
+            //         "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b",
+            //         "0.0.346530",
+            //          "0.12345678",
+            //         "unity-sdk-free-token-transfer",
+            //         true
+            //     )
+            // );
             
+
+            // create account (without mnemonic)
+             Debug.Log(
+                // await bladeSdk.createAccount("some device id string")
+                await bladeSdk.createAccount("")
+            );
+
+
 
         }
     }

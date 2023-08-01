@@ -107,6 +107,68 @@ namespace BladeLabs.UnitySDK
             }
         }
 
+        public async Task<CreateAccountResponse> createAccount(string publicKey, string deviceId, string xTvteApiToken) {
+            using (HttpClient httpClient = new HttpClient()) {
+                try {
+                    CreateAccountRequest request = new CreateAccountRequest {
+                        publicKey = publicKey
+                    };
+                    string body = JsonUtility.ToJson(request);
+
+                    HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                    
+                    httpClient.DefaultRequestHeaders.Add("X-NETWORK", this.network.ToString().ToUpper());
+                    httpClient.DefaultRequestHeaders.Add("X-VISITOR-ID", this.visitorId);
+                    httpClient.DefaultRequestHeaders.Add("X-DAPP-CODE", this.dAppCode);
+                    httpClient.DefaultRequestHeaders.Add("X-SDK-TVTE-API", xTvteApiToken);
+                    
+                    if (deviceId != "") {
+                        httpClient.DefaultRequestHeaders.Add("X-DID-API", deviceId);
+                    }
+
+                    HttpResponseMessage response = await httpClient.PostAsync(getApiUrl($"/accounts"), bodyContent);
+
+                    string content = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode) {
+                        var responseObject = JsonUtility.FromJson<CreateAccountResponse>(content);
+                        return responseObject;
+                    } else {
+                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
+                    }
+                } catch (HttpRequestException ex) {
+                    throw new BladeSDKException($"HttpRequestException", ex.Message);
+                }
+            }
+        }
+
+        public async Task<bool> confirmAccountUpdate(string accountId, string xTvteApiToken) {
+            using (HttpClient httpClient = new HttpClient()) {
+                try {
+                    ConfirmAccountRequest request = new ConfirmAccountRequest {
+                        id = accountId
+                    };
+                    string body = JsonUtility.ToJson(request);
+                    HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                    
+                    httpClient.DefaultRequestHeaders.Add("X-NETWORK", this.network.ToString().ToUpper());
+                    httpClient.DefaultRequestHeaders.Add("X-VISITOR-ID", this.visitorId);
+                    httpClient.DefaultRequestHeaders.Add("X-DAPP-CODE", this.dAppCode);
+                    httpClient.DefaultRequestHeaders.Add("X-SDK-TVTE-API", xTvteApiToken);
+
+                    HttpResponseMessage response = await httpClient.PatchAsync(getApiUrl($"/accounts/confirm"), bodyContent);
+
+                    string content = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode) {
+                        return true;
+                    } else {
+                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
+                    }
+                } catch (HttpRequestException ex) {
+                    throw new BladeSDKException($"HttpRequestException", ex.Message);
+                }
+            }
+        }
 
 
         public async Task<List<TokenBalance>> getAccountTokens(string accountId) {

@@ -19,7 +19,7 @@ namespace BladeLabs.UnitySDK
         private Network network = Network.Testnet;
         string dAppCode;
         private SdkEnvironment sdkEnvironment;
-        string sdkVersion = "Unity@0.6.0";
+        string sdkVersion = "Swift@0.6.0"; // "Unity@0.6.0";
         private string executeApiEndpoint;
         
         public BladeSDK(string apiKey, Network network, string dAppCode, SdkEnvironment sdkEnvironment, string executeApiEndpoint = "http://localhost:8443/signer/tx") {
@@ -75,11 +75,7 @@ namespace BladeLabs.UnitySDK
                 FreeTokenTransferResponse freeTokenTransferResponse = await apiService.freeTokenTransfer(accountId, recieverAccount, correctedAmount, memo, tvteResponse.tvte);
 
                 // sign with sender private key
-                string signedTxResponse = engine
-                    .Evaluate($"window.bladeSdk.signTransaction('{freeTokenTransferResponse.transactionBytes}', 'base64', '{accountPrivateKey}')")
-                    .UnwrapIfPromise()
-                    .ToString();
-                SignedTx signedTx = this.processResponse<SignedTx>(signedTxResponse);
+                SignedTx signedTx = this.signTransaction(freeTokenTransferResponse.transactionBytes, "base64", accountPrivateKey);
 
                 //send tx to execution
                 return await apiService.executeTx(signedTx.tx, signedTx.network);
@@ -97,10 +93,64 @@ namespace BladeLabs.UnitySDK
 
         // TODO: contractCallFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, completionKey?: string): Promise<Partial<TransactionReceipt>>
         // TODO: contractCallQueryFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, resultTypes: string[]): Promise<ContractCallQueryRecord[]>
-        // WIP: transferTokens(tokenId: string, accountId: string, accountPrivateKey: string, receiverID: string, amount: string, memo: string, freeTransfer: boolean = false, completionKey?: string): Promise<TransactionResponse> {
-        // TODO: createAccount(deviceId?: string, completionKey?: string): Promise<CreateAccountData>
         // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
         // TODO: deleteAccount(deleteAccountId: string, deletePrivateKey: string, transferAccountId: string, operatorAccountId: string, operatorPrivateKey: string, completionKey?: string): Promise<TransactionReceipt>
+
+        private SignedTx signTransaction(string transactionBytes, string encoding, string accountPrivateKey) {
+            string signedTxResponse = engine
+                .Evaluate($"window.bladeSdk.signTransaction('{transactionBytes}', '{encoding}', '{accountPrivateKey}')")
+                .UnwrapIfPromise()
+                .ToString();
+            return this.processResponse<SignedTx>(signedTxResponse);
+        }
+
+        private string getTvteToken() {
+            // generating TVTE token    
+            string response = engine
+                    .Evaluate($"window.bladeSdk.getTvteValue()")
+                    .UnwrapIfPromise()
+                    .ToString();
+            TVTEResponse tvteResponse = this.processResponse<TVTEResponse>(response);
+            return tvteResponse.tvte;
+        }
+
+        public async Task<CreateAccountData> createAccount(string deviceId) {
+            // generateKeys
+            string keyResponse = engine
+                .Evaluate($"window.bladeSdk.generateKeys()")
+                .UnwrapIfPromise()
+                .ToString();
+            KeyPairData keyPairData = this.processResponse<KeyPairData>(keyResponse);
+            string tvteToken = this.getTvteToken();
+
+            CreateAccountResponse createAccountResponse = await apiService.createAccount(keyPairData.publicKey, deviceId, tvteToken);
+
+            // sign and execute transactions if any
+            if (createAccountResponse.updateAccountTransactionBytes != null) {
+                SignedTx signedTx = this.signTransaction(createAccountResponse.updateAccountTransactionBytes, "base64", keyPairData.privateKey);
+                ExecuteTxReceipt executeTxReceipt = await apiService.executeTx(signedTx.tx, signedTx.network);
+                // confirm account key update
+                if (executeTxReceipt.status == "SUCCESS") {
+                    await apiService.confirmAccountUpdate(createAccountResponse.id, tvteToken);
+                }
+            }
+
+            if (createAccountResponse.transactionBytes != null) {
+                SignedTx signedTx = this.signTransaction(createAccountResponse.transactionBytes, "base64", keyPairData.privateKey);
+                ExecuteTxReceipt executeTxReceipt = await apiService.executeTx(signedTx.tx, signedTx.network);
+            }
+
+            CreateAccountData createAccountData = new CreateAccountData {
+                transactionId = createAccountResponse.transactionId,
+                status = string.IsNullOrEmpty(createAccountResponse.transactionId) ? "SUCCESS" : "PENDING",
+                seedPhrase = "[not supported in now]",
+                publicKey = keyPairData.publicKey,
+                privateKey = keyPairData.privateKey,
+                accountId = createAccountResponse.id,
+                evmAddress = keyPairData.evmAddress
+            };
+            return createAccountData;
+        }
 
         public async Task<AccountInfoData> getAccountInfo(string accountId) {
             var account = await apiService.getAccount(accountId);

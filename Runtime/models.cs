@@ -118,11 +118,51 @@ namespace BladeLabs.UnitySDK {
     };
 
     [Serializable]
+    public class CreateAccountRequest {
+        public string publicKey;
+    }
+
+    [Serializable] 
+    public class ConfirmAccountRequest {
+        public string id;
+    }
+
+    [Serializable]
     public class FreeTokenTransferResponse {
         public string transactionBytes;
 
         public override string ToString() {
             return $@"{{transactionBytes = {transactionBytes}}}";
+        }
+    }
+
+    [Serializable]
+    public class CreateAccountResponse {
+        public string id;
+        public string network;
+        public int maxAutoTokenAssociation;
+        public string associationPresetTokenStatus;
+        public string transactionBytes;
+        public string updateAccountTransactionBytes;
+        public string transactionId;
+
+        public override string ToString() {
+            return $@"{{id = {id}, network = {network}, maxAutoTokenAssociation = {maxAutoTokenAssociation}, associationPresetTokenStatus = {associationPresetTokenStatus}, transactionBytes = {transactionBytes}, updateAccountTransactionBytes = {updateAccountTransactionBytes}, transactionId = {transactionId}}}";
+        }
+    }
+
+    [Serializable]
+    public class CreateAccountData {
+        public string transactionId;
+        public string status;
+        public string seedPhrase;
+        public string publicKey;
+        public string privateKey;
+        public string accountId;
+        public string evmAddress;
+
+        public override string ToString() {
+            return $@"{{transactionId = {transactionId}, status = {status}, seedPhrase = {seedPhrase}, publicKey = {publicKey}, privateKey = {privateKey}, accountId = {accountId}, evmAddress = {evmAddress}}}";
         }
     }
     
@@ -210,6 +250,17 @@ namespace BladeLabs.UnitySDK {
     
         public override string ToString() {
             return $@"{{key = {key}, _type = {_type}}}";
+        }
+    }
+
+    [Serializable]
+    public class KeyPairData {
+        public string privateKey;
+        public string publicKey;
+        public string evmAddress;
+    
+        public override string ToString() {
+            return $@"{{privateKey = {privateKey}, publicKey = {publicKey}, evmAddress = {evmAddress}}}";
         }
     }
 
