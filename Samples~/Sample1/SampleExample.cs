@@ -9,6 +9,15 @@ namespace BladeLabs.UnitySDK.Samples
         {
             BladeSDK bladeSdk = new BladeSDK("ygUgCzRrsvhWmb3dsLcDpGnJpSZ4tk8hACmZqg9WngpuQYKdnD5m8FjfPV3XVUeB", Network.Testnet, "unitysdktest", SdkEnvironment.CI, "http://localhost:8443/signer/tx");
 
+            // get info
+            // Debug.Log(await bladeSdk.getInfo());
+
+            // get account info
+            // Debug.Log(await bladeSdk.getAccountInfo("0.0.346533"));
+
+            // get balance
+            // Debug.Log(await bladeSdk.getBalance("0.0.346533"));
+
             // transfer hbars
             // Debug.Log(
             //     await bladeSdk.transferHbars(
@@ -20,16 +29,6 @@ namespace BladeLabs.UnitySDK.Samples
             //     )
             // );
             
-            // get balance
-            // Debug.Log(await bladeSdk.getBalance("0.0.346533"));
-
-
-            // get info
-            // Debug.Log(await bladeSdk.getInfo());
-
-            // get account info
-            // Debug.Log(await bladeSdk.getAccountInfo("0.0.346533"));
-
             // transfer tokens
             // Debug.Log(
             //     await bladeSdk.transferTokens(
@@ -56,12 +55,26 @@ namespace BladeLabs.UnitySDK.Samples
             //     )
             // );
             
-
             // create account (without mnemonic)
-             Debug.Log(
-                // await bladeSdk.createAccount("some device id string")
-                await bladeSdk.createAccount("")
+            //  Debug.Log(
+                // await bladeSdk.createAccount("some device id string, if required")
+            // );
+
+            // contract call
+            ContractFunctionParameters parameters = new ContractFunctionParameters();
+            parameters.addString("Hello Unity SDK");
+            Debug.Log(
+                await bladeSdk.contractCallFunction(
+                    "0.0.416245", 
+                    "set_message", 
+                    parameters, 
+                    "0.0.346533", 
+                    "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", 
+                    10000,
+                    true
+                )
             );
+
 
 
 

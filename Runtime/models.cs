@@ -303,4 +303,19 @@ namespace BladeLabs.UnitySDK {
             return $@"{{tokens = [{string.Join(", ", tokens)}], links = {links}}}";
         }
     }
+
+    [Serializable]
+    public class ContractFunctionParameter {
+        public string type;
+        public List<string> value;
+
+        public ContractFunctionParameter(string type, List<string> value) {
+            this.type = type;
+            this.value = value;
+        }
+
+        public override string ToString() {
+            return $@"{{type = {type}, value = [{string.Join(", ", value)}]}}";
+        }
+    }
 }
