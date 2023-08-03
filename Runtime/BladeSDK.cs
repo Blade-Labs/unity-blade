@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Timers;
 
-using System.Numerics;
-
 /**
     Mnemonic not supported:
         - no `getKeysFromMnemonic` method
         - `createAccount` not returning mnemonic
+
+    TODO: handle errors from remote signer server 
 
     // TODO: contractCallFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, completionKey?: string): Promise<Partial<TransactionReceipt>>
     // TODO: contractCallQueryFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, resultTypes: string[]): Promise<ContractCallQueryRecord[]>
@@ -173,38 +173,31 @@ namespace BladeLabs.UnitySDK
         }
 
         public async Task<ExecuteTxReceipt> contractCallFunction(string contractId, string functionName, ContractFunctionParameters parameters, string accountId, string accountPrivateKey, uint gas, bool bladePayFee = false) {
-            
-            
-            ContractFunctionParameters tuple0 = new ContractFunctionParameters().addInt64(16).addInt64(32);
-            ContractFunctionParameters tuple1 = new ContractFunctionParameters().addInt64(5).addInt64(10);
-            ContractFunctionParameters tuple2 = new ContractFunctionParameters().addInt64(50).addTupleArray(new List<ContractFunctionParameters> {tuple0, tuple1});
+            if (bladePayFee) {
+                string contractCallBytecodeResponse = engine
+                    .Evaluate($"window.bladeSdk.getContractCallBytecode('{functionName}', '{parameters.encode()}')")
+                    .UnwrapIfPromise()
+                    .ToString();
+                ContractCallBytecode contractCallBytecode = this.processResponse<ContractCallBytecode>(contractCallBytecodeResponse);
 
-            ContractFunctionParameters parametersTest = new ContractFunctionParameters();
-            parametersTest
-                .addString("Hello, Backend")
-                .addBytes32(new List<uint> { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F})
-                .addAddressArray(new List<string> {"0.0.48738539", "0.0.48738538", "0.0.48738537"})
-                .addAddress("0.0.48850466")
-                .addAddress("0.0.499326")
-                .addAddress("0.0.48801688")
-                .addInt64(1)
-                .addUInt8(123)
-                .addUInt64Array(new List<ulong> {1,2,3})
-                .addUInt256Array(new List<BigInteger> {1,2,3})
-                .addTuple(tuple1)
-                .addTuple(tuple2)
-                .addTupleArray(new List<ContractFunctionParameters> {tuple0, tuple1})
-                .addTupleArray(new List<ContractFunctionParameters> {tuple2, tuple2})
-                .addAddress("0.0.12345")
-                .addUInt64(56784645645)
-                .addUInt256(12345)
-            ;            
-            
-            
-            Debug.Log(parametersTest.encode() == "W3sidHlwZSI6InN0cmluZyIsInZhbHVlIjpbIkhlbGxvLCBCYWNrZW5kIl19LHsidHlwZSI6ImJ5dGVzMzIiLCJ2YWx1ZSI6WyJXekFzTVN3eUxETXNOQ3cxTERZc055dzRMRGtzTVRBc01URXNNVElzTVRNc01UUXNNVFVzTVRZc01UY3NNVGdzTVRrc01qQXNNakVzTWpJc01qTXNNalFzTWpVc01qWXNNamNzTWpnc01qa3NNekFzTXpGZCJdfSx7InR5cGUiOiJhZGRyZXNzW10iLCJ2YWx1ZSI6WyIwLjAuNDg3Mzg1MzkiLCIwLjAuNDg3Mzg1MzgiLCIwLjAuNDg3Mzg1MzciXX0seyJ0eXBlIjoiYWRkcmVzcyIsInZhbHVlIjpbIjAuMC40ODg1MDQ2NiJdfSx7InR5cGUiOiJhZGRyZXNzIiwidmFsdWUiOlsiMC4wLjQ5OTMyNiJdfSx7InR5cGUiOiJhZGRyZXNzIiwidmFsdWUiOlsiMC4wLjQ4ODAxNjg4Il19LHsidHlwZSI6ImludDY0IiwidmFsdWUiOlsiMSJdfSx7InR5cGUiOiJ1aW50OCIsInZhbHVlIjpbIjEyMyJdfSx7InR5cGUiOiJ1aW50NjRbXSIsInZhbHVlIjpbIjEiLCIyIiwiMyJdfSx7InR5cGUiOiJ1aW50MjU2W10iLCJ2YWx1ZSI6WyIxIiwiMiIsIjMiXX0seyJ0eXBlIjoidHVwbGUiLCJ2YWx1ZSI6WyJXM3NpZEhsd1pTSTZJbWx1ZERZMElpd2lkbUZzZFdVaU9sc2lOU0pkZlN4N0luUjVjR1VpT2lKcGJuUTJOQ0lzSW5aaGJIVmxJanBiSWpFd0lsMTlYUT09Il19LHsidHlwZSI6InR1cGxlIiwidmFsdWUiOlsiVzNzaWRIbHdaU0k2SW1sdWREWTBJaXdpZG1Gc2RXVWlPbHNpTlRBaVhYMHNleUowZVhCbElqb2lkSFZ3YkdWYlhTSXNJblpoYkhWbElqcGJJbGN6YzJsa1NHeDNXbE5KTmtsdGJIVmtSRmt3U1dsM2FXUnRSbk5rVjFWcFQyeHphVTFVV1dsWVdEQnpaWGxLTUdWWVFteEphbTlwWVZjMU1FNXFVV2xNUTBveVdWZDRNVnBUU1RaWGVVbDZUV2xLWkdaV01EMGlMQ0pYTTNOcFpFaHNkMXBUU1RaSmJXeDFaRVJaTUVscGQybGtiVVp6WkZkVmFVOXNjMmxPVTBwa1psTjROMGx1VWpWalIxVnBUMmxLY0dKdVVUSk9RMGx6U1c1YWFHSklWbXhKYW5CaVNXcEZkMGxzTVRsWVVUMDlJbDE5WFE9PSJdfSx7InR5cGUiOiJ0dXBsZVtdIiwidmFsdWUiOlsiVzNzaWRIbHdaU0k2SW1sdWREWTBJaXdpZG1Gc2RXVWlPbHNpTVRZaVhYMHNleUowZVhCbElqb2lhVzUwTmpRaUxDSjJZV3gxWlNJNld5SXpNaUpkZlYwPSIsIlczc2lkSGx3WlNJNkltbHVkRFkwSWl3aWRtRnNkV1VpT2xzaU5TSmRmU3g3SW5SNWNHVWlPaUpwYm5RMk5DSXNJblpoYkhWbElqcGJJakV3SWwxOVhRPT0iXX0seyJ0eXBlIjoidHVwbGVbXSIsInZhbHVlIjpbIlczc2lkSGx3WlNJNkltbHVkRFkwSWl3aWRtRnNkV1VpT2xzaU5UQWlYWDBzZXlKMGVYQmxJam9pZEhWd2JHVmJYU0lzSW5aaGJIVmxJanBiSWxjemMybGtTR3gzV2xOSk5rbHRiSFZrUkZrd1NXbDNhV1J0Um5Oa1YxVnBUMnh6YVUxVVdXbFlXREJ6WlhsS01HVllRbXhKYW05cFlWYzFNRTVxVVdsTVEwb3lXVmQ0TVZwVFNUWlhlVWw2VFdsS1pHWldNRDBpTENKWE0zTnBaRWhzZDFwVFNUWkpiV3gxWkVSWk1FbHBkMmxrYlVaelpGZFZhVTlzYzJsT1UwcGtabE40TjBsdVVqVmpSMVZwVDJsS2NHSnVVVEpPUTBselNXNWFhR0pJVm14SmFuQmlTV3BGZDBsc01UbFlVVDA5SWwxOVhRPT0iLCJXM3NpZEhsd1pTSTZJbWx1ZERZMElpd2lkbUZzZFdVaU9sc2lOVEFpWFgwc2V5SjBlWEJsSWpvaWRIVndiR1ZiWFNJc0luWmhiSFZsSWpwYklsY3pjMmxrU0d4M1dsTkpOa2x0YkhWa1JGa3dTV2wzYVdSdFJuTmtWMVZwVDJ4emFVMVVXV2xZV0RCelpYbEtNR1ZZUW14SmFtOXBZVmMxTUU1cVVXbE1RMG95V1ZkNE1WcFRTVFpYZVVsNlRXbEtaR1pXTUQwaUxDSlhNM05wWkVoc2QxcFRTVFpKYld4MVpFUlpNRWxwZDJsa2JVWnpaRmRWYVU5c2MybE9VMHBrWmxONE4wbHVValZqUjFWcFQybEtjR0p1VVRKT1EwbHpTVzVhYUdKSVZteEphbkJpU1dwRmQwbHNNVGxZVVQwOUlsMTlYUT09Il19LHsidHlwZSI6ImFkZHJlc3MiLCJ2YWx1ZSI6WyIwLjAuMTIzNDUiXX0seyJ0eXBlIjoidWludDY0IiwidmFsdWUiOlsiNTY3ODQ2NDU2NDUiXX0seyJ0eXBlIjoidWludDI1NiIsInZhbHVlIjpbIjEyMzQ1Il19XQ==");
-
-            Debug.Log($"contractCallFunction(contractId = {contractId}, functionName = {functionName}, params = {parameters.encode()}, accountId = {accountId}, accountPrivateKey = {accountPrivateKey}, gas = {gas}, bladePayFee = {bladePayFee.ToString()})");
-            throw new BladeSDKException("Stop", "no return");
+                SignContractCallResponse signContractCallResponse = await apiService.signContractCallTx(
+                    contractCallBytecode.contractFunctionParameters,
+                    contractId,
+                    functionName,
+                    gas,
+                    this.getTvteToken(),
+                    false
+                );
+                SignedTx signedTx = this.signTransaction(signContractCallResponse.transactionBytes, "base64", accountPrivateKey);
+                return await apiService.executeTx(signedTx.tx, signedTx.network);
+            } else {
+                string signedTxResponse = engine
+                    .Evaluate($"window.bladeSdk.contractCallFunctionTransaction('{contractId}', '{functionName}', '{parameters.encode()}', '{accountId}', '{accountPrivateKey}', {gas})")
+                    .UnwrapIfPromise()
+                    .ToString();
+                SignedTx signedTx = this.processResponse<SignedTx>(signedTxResponse);
+                return await apiService.executeTx(signedTx.tx, signedTx.network);
+            }
         }
 
 

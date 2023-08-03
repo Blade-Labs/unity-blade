@@ -61,6 +61,22 @@ namespace BladeLabs.UnitySDK.Samples
             // );
 
             // contract call
+            // ContractFunctionParameters parameters = new ContractFunctionParameters();
+            // parameters.addString("Hello Unity SDK");
+            // Debug.Log(
+            //     await bladeSdk.contractCallFunction(
+            //         "0.0.416245", 
+            //         "set_message", 
+            //         parameters, 
+            //         "0.0.346533", 
+            //         "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", 
+            //         150000,
+            //         false
+            //     )
+            // );
+
+
+            // contract call (Blade pay fee)
             ContractFunctionParameters parameters = new ContractFunctionParameters();
             parameters.addString("Hello Unity SDK");
             Debug.Log(
@@ -70,7 +86,7 @@ namespace BladeLabs.UnitySDK.Samples
                     parameters, 
                     "0.0.346533", 
                     "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", 
-                    10000,
+                    150000,
                     true
                 )
             );

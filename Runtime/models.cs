@@ -118,6 +118,18 @@ namespace BladeLabs.UnitySDK {
     };
 
     [Serializable]
+    public class SignContractCallRequest {
+        public string functionParametersHash;
+        public string contractId;
+        public string functionName;
+        public uint gas;
+
+        public override string ToString() {
+            return $@"{{contractId = {contractId}, functionName = {functionName}, gas = {gas}, functionParametersHash = {functionParametersHash}}}";
+        }
+    };
+
+    [Serializable]
     public class CreateAccountRequest {
         public string publicKey;
     }
@@ -134,6 +146,13 @@ namespace BladeLabs.UnitySDK {
         public override string ToString() {
             return $@"{{transactionBytes = {transactionBytes}}}";
         }
+    }
+
+    [Serializable]
+    public class SignContractCallResponse {
+        public string transactionBytes;
+        // contractFunctionResult
+        // rawResult
     }
 
     [Serializable]
@@ -316,6 +335,15 @@ namespace BladeLabs.UnitySDK {
 
         public override string ToString() {
             return $@"{{type = {type}, value = [{string.Join(", ", value)}]}}";
+        }
+    }
+
+    [Serializable]
+    public class ContractCallBytecode {
+        public string contractFunctionParameters;
+
+        public override string ToString() {
+            return $@"{{contractFunctionParameters = {contractFunctionParameters}}}";
         }
     }
 }

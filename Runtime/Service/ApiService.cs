@@ -170,6 +170,48 @@ namespace BladeLabs.UnitySDK
             }
         }
 
+        public async Task<SignContractCallResponse> signContractCallTx(
+            string contractFunctionParameters,
+            string contractId,
+            string functionName,
+            uint gas,
+            string xTvteApiToken,
+            bool contractCallQuery = false
+        ) {
+            using (HttpClient httpClient = new HttpClient()) {
+                try {
+                    SignContractCallRequest request = new SignContractCallRequest {
+                        functionParametersHash = contractFunctionParameters,
+                        contractId = contractId,
+                        functionName = functionName,
+                        gas = gas
+                    };
+                    string body = JsonUtility.ToJson(request);
+                    HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                    
+                    httpClient.DefaultRequestHeaders.Add("X-NETWORK", this.network.ToString().ToUpper());
+                    httpClient.DefaultRequestHeaders.Add("X-VISITOR-ID", this.visitorId);
+                    httpClient.DefaultRequestHeaders.Add("X-DAPP-CODE", this.dAppCode);
+                    httpClient.DefaultRequestHeaders.Add("X-SDK-TVTE-API", xTvteApiToken);
+                    
+                    HttpResponseMessage response = await httpClient.PostAsync(getApiUrl($"/smart/contract/{(contractCallQuery ? "call" : "sign")}"), bodyContent);
+
+                    string content = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode) {
+
+// TODO REMOVE. Debugging contractCallQuery 
+Debug.Log($"isQuery = {contractCallQuery}, rawResponse = {content}");
+
+                        var responseObject = JsonUtility.FromJson<SignContractCallResponse>(content);
+                        return responseObject;
+                    } else {
+                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
+                    }
+                } catch (HttpRequestException ex) {
+                    throw new BladeSDKException($"HttpRequestException", ex.Message);
+                }
+            }
+        }
 
         public async Task<List<TokenBalance>> getAccountTokens(string accountId) {
             List<TokenBalance> result = new List<TokenBalance>();
