@@ -1,5 +1,6 @@
 using BladeLabs.UnitySDK;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace BladeLabs.UnitySDK.Samples
 {
@@ -7,7 +8,7 @@ namespace BladeLabs.UnitySDK.Samples
     {
         async void Start()
         {
-            BladeSDK bladeSdk = new BladeSDK("ygUgCzRrsvhWmb3dsLcDpGnJpSZ4tk8hACmZqg9WngpuQYKdnD5m8FjfPV3XVUeB", Network.Testnet, "unitysdktest", SdkEnvironment.CI, "http://localhost:8443/signer/tx");
+            BladeSDK bladeSdk = new BladeSDK("ygUgCzRrsvhWmb3dsLcDpGnJpSZ4tk8hACmZqg9WngpuQYKdnD5m8FjfPV3XVUeB", Network.Testnet, "unitysdktest", SdkEnvironment.CI, "http://localhost:8443");
 
             // get info
             // Debug.Log(await bladeSdk.getInfo());
@@ -77,17 +78,32 @@ namespace BladeLabs.UnitySDK.Samples
 
 
             // contract call (Blade pay fee)
-            ContractFunctionParameters parameters = new ContractFunctionParameters();
-            parameters.addString("Hello Unity SDK");
+            // ContractFunctionParameters parameters = new ContractFunctionParameters();
+            // parameters.addString("Hello Unity SDK");
+            // Debug.Log(
+            //     await bladeSdk.contractCallFunction(
+            //         "0.0.416245", 
+            //         "set_message", 
+            //         parameters, 
+            //         "0.0.346533", 
+            //         "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", 
+            //         150000,
+            //         true
+            //     )
+            // );
+
+
+            // contract call query 
             Debug.Log(
-                await bladeSdk.contractCallFunction(
+                await bladeSdk.contractCallQueryFunction(
                     "0.0.416245", 
-                    "set_message", 
-                    parameters, 
+                    "get_message", 
+                    new ContractFunctionParameters(), 
                     "0.0.346533", 
                     "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", 
-                    150000,
-                    true
+                    150000, // gas
+                    70000000, // tinybars
+                    new List<string> {"string", "int32"}
                 )
             );
 

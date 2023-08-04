@@ -346,4 +346,20 @@ namespace BladeLabs.UnitySDK {
             return $@"{{contractFunctionParameters = {contractFunctionParameters}}}";
         }
     }
+
+    [Serializable]
+    public class DelayedQueryCall {
+        public string queryHex;
+        public List<string> signedBuffers;
+        public ulong sharedTimestamp;
+        public string nodeAccountId;
+        public string publicKey;
+        public string accountId;
+        public ulong fee;
+        public string network;
+
+        public override string ToString() {
+            return $@"{{queryHex = {queryHex}, signedBuffers = [{string.Join(", ", signedBuffers)}], sharedTimestamp = {sharedTimestamp}, nodeAccountId = {nodeAccountId}, publicKey = {publicKey}, accountId = {accountId}, fee = {fee}, network = {network}}}";
+        }
+    }
 }

@@ -23,6 +23,10 @@ namespace BladeLabs.UnitySDK
             this.dAppCode = dAppCode;
         }
 
+        private string getSdkApi(string route) {
+            return this.executeApiEndpoint + route;
+        }
+
         private string getApiUrl(string route) {
             string host = this.sdkEnvironment == SdkEnvironment.Prod
                 ? "https://rest.prod.bladewallet.io/openapi/v7"
@@ -258,10 +262,30 @@ Debug.Log($"isQuery = {contractCallQuery}, rawResponse = {content}");
                     };
                     string body = JsonUtility.ToJson(request);
                     HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await httpClient.PostAsync(this.executeApiEndpoint, bodyContent);
-
+                    HttpResponseMessage response = await httpClient.PostAsync(getSdkApi("/signer/tx"), bodyContent);
                     string content = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode) {
+                        var responseObject = JsonUtility.FromJson<ExecuteTxReceipt>(content);
+                        return responseObject;
+                    } else {
+                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
+                    }
+                } catch (HttpRequestException ex) {
+                    throw new BladeSDKException($"HttpRequestException", ex.Message);
+                }
+            }
+        }
+
+        
+        public async Task<ExecuteTxReceipt> executeDelayedQueryCall(DelayedQueryCall delayedQueryCall) {
+            using (HttpClient httpClient = new HttpClient()) {
+                try {
+                    string body = JsonUtility.ToJson(delayedQueryCall);
+                    HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await httpClient.PostAsync(getSdkApi("/signer/query"), bodyContent);
+                    string content = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode) {
+                        // TODO describe data class 
                         var responseObject = JsonUtility.FromJson<ExecuteTxReceipt>(content);
                         return responseObject;
                     } else {

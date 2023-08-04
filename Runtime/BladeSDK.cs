@@ -15,6 +15,8 @@ using System.Timers;
 
     TODO: handle errors from remote signer server 
 
+    TODO: get from BladeConfig nodeAccountId = "0.0.3";
+
     // TODO: contractCallFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, completionKey?: string): Promise<Partial<TransactionReceipt>>
     // TODO: contractCallQueryFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, resultTypes: string[]): Promise<ContractCallQueryRecord[]>
     // TODO: getC14url(asset: string, account: string, amount: string, completionKey?: string): Promise<IntegrationUrlData> {
@@ -42,7 +44,7 @@ namespace BladeLabs.UnitySDK
         string sdkVersion = "Swift@0.6.0"; // "Unity@0.6.0";
         private string executeApiEndpoint;
         
-        public BladeSDK(string apiKey, Network network, string dAppCode, SdkEnvironment sdkEnvironment, string executeApiEndpoint = "http://localhost:8443/signer/tx") {
+        public BladeSDK(string apiKey, Network network, string dAppCode, SdkEnvironment sdkEnvironment, string executeApiEndpoint = "http://localhost:8443") {
             this.apiKey = apiKey;
             this.network = network;
             this.dAppCode = dAppCode;
@@ -200,9 +202,39 @@ namespace BladeLabs.UnitySDK
             }
         }
 
+        public async Task<bool> contractCallQueryFunction(
+            string contractId, 
+            string functionName, 
+            ContractFunctionParameters parameters,
+            string accountId,
+            string accountPrivateKey, 
+            uint gas, 
+            uint fee,
+            List<string> paramsListreturnTypes
+        ) {
+            if (fee > 0) {
+                string nodeAccountId = "0.0.3";            
+                string delayedQueryCallResponse = engine
+                    .Evaluate($"window.bladeSdk.contractCallQueryFunction('{contractId}', '{functionName}', '{parameters.encode()}', '{accountId}', '{accountPrivateKey}', {gas}, {fee}, '{nodeAccountId}')")
+                    .UnwrapIfPromise()
+                    .ToString();
+                DelayedQueryCall delayedQueryCall = this.processResponse<DelayedQueryCall>(delayedQueryCallResponse);
 
-        
+                
 
+                Debug.Log(
+                    await apiService.executeDelayedQueryCall(delayedQueryCall)
+                );
+                // make response similar to BladeApi
+                // parse response
+                // process response on JS side
+                // return data structs like on Kotlin/Swift SDK
+            } else {
+                // blade pay fee 
+            }
+            
+            return false;
+        }
 
         // PRIVATE METHODS
 
