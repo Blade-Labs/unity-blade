@@ -403,4 +403,13 @@ namespace BladeLabs.UnitySDK {
         }
     }
 
+    [Serializable]
+    public class C14Config {
+        public string token;
+
+        public override string ToString() {
+            return $@"{{token = {token}}}";
+        }
+    }
+
 }

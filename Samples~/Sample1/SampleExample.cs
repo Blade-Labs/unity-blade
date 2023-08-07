@@ -94,18 +94,24 @@ namespace BladeLabs.UnitySDK.Samples
 
 
             // contract call query (self pay)
+            // Debug.Log(
+            //     await bladeSdk.contractCallQueryFunction(
+            //         "0.0.416245", 
+            //         "get_message", 
+            //         new ContractFunctionParameters(), 
+            //         "0.0.346533", 
+            //         "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", 
+            //         150000, // gas
+            //         70000000, // tinybars
+            //         new List<string> {"string", "int32"}
+            //     )
+            // );
+
+            // C14 url
             Debug.Log(
-                await bladeSdk.contractCallQueryFunction(
-                    "0.0.416245", 
-                    "get_message", 
-                    new ContractFunctionParameters(), 
-                    "0.0.346533", 
-                    "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", 
-                    150000, // gas
-                    70000000, // tinybars
-                    new List<string> {"string", "int32"}
-                )
+                await bladeSdk.getC14url("karate", "0.0.123456", "1234")
             );
+            
 
 
 

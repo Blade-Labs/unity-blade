@@ -217,6 +217,27 @@ Debug.Log($"isQuery = {contractCallQuery}, rawResponse = {content}");
             }
         }
 
+        public async Task<string> getC14token(string xTvteApiToken) {
+            using (HttpClient httpClient = new HttpClient()) {
+                try {
+                    httpClient.DefaultRequestHeaders.Add("X-NETWORK", this.network.ToString().ToUpper());
+                    httpClient.DefaultRequestHeaders.Add("X-VISITOR-ID", this.visitorId);
+                    httpClient.DefaultRequestHeaders.Add("X-DAPP-CODE", this.dAppCode);
+                    httpClient.DefaultRequestHeaders.Add("X-SDK-TVTE-API", xTvteApiToken);
+                    HttpResponseMessage response = await httpClient.GetAsync(getApiUrl($"/c14/data"));
+                    string content = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode) {
+                        C14Config c14Config = JsonUtility.FromJson<C14Config>(content);
+                        return c14Config.token;
+                    } else {
+                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
+                    }
+                } catch (HttpRequestException ex) {
+                    throw new BladeSDKException($"HttpRequestException", ex.Message);
+                }
+            }
+        }
+
         public async Task<List<TokenBalance>> getAccountTokens(string accountId) {
             List<TokenBalance> result = new List<TokenBalance>();
 

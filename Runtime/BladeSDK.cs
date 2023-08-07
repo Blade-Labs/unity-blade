@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Timers;
+using System.Web;
 
 /**
     Mnemonic not supported:
@@ -16,10 +17,6 @@ using System.Timers;
     TODO: handle errors from remote signer server 
 
     TODO: get from BladeConfig nodeAccountId = "0.0.3";
-
-    // TODO: contractCallFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, completionKey?: string): Promise<Partial<TransactionReceipt>>
-    // TODO: contractCallQueryFunction(contractId: string, functionName: string, paramsEncoded: string | ParametersBuilder, accountId: string, accountPrivateKey: string, gas: number = 100000, bladePayFee: boolean = false, resultTypes: string[]): Promise<ContractCallQueryRecord[]>
-    // TODO: getC14url(asset: string, account: string, amount: string, completionKey?: string): Promise<IntegrationUrlData> {
 
     // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
     // TODO: deleteAccount(deleteAccountId: string, deletePrivateKey: string, transferAccountId: string, operatorAccountId: string, operatorPrivateKey: string, completionKey?: string): Promise<TransactionReceipt>
@@ -233,6 +230,61 @@ namespace BladeLabs.UnitySDK
                 throw new BladeSDKException("Error", "free queries not implemented yet");
             }
         }
+
+
+        public async Task<string> getC14url(
+            string asset,
+            string account,
+            string amount
+        ) {
+            string tvteToken = this.getTvteToken();
+            string clientId = await apiService.getC14token(tvteToken);
+            
+            var purchaseParams = new Dictionary<string, object> {
+                { "clientId", clientId }
+            };
+
+            switch (asset.ToUpper()) {
+                case "USDC":
+                    purchaseParams["targetAssetId"] = "b0694345-1eb4-4bc4-b340-f389a58ee4f3";
+                    purchaseParams["targetAssetIdLock"] = "true";
+                    break;
+                case "HBAR":
+                    purchaseParams["targetAssetId"] = "d9b45743-e712-4088-8a31-65ee6f371022";
+                    purchaseParams["targetAssetIdLock"] = "true";
+                    break;
+                case "KARATE":
+                    purchaseParams["targetAssetId"] = "057d6b35-1af5-4827-bee2-c12842faa49e";
+                    purchaseParams["targetAssetIdLock"] = "true";
+                    break;
+                default:
+                    if (asset.Split('-').Length == 5) {
+                        purchaseParams["targetAssetId"] = asset;
+                        purchaseParams["targetAssetIdLock"] = "true";
+                    }
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(amount)) {
+                purchaseParams["sourceAmount"] = amount;
+                purchaseParams["quoteAmountLock"] = "true";
+            }
+
+            if (!string.IsNullOrEmpty(account)) {
+                purchaseParams["targetAddress"] = account;
+                purchaseParams["targetAddressLock"] = "true";
+            }
+
+            string queryString = "";
+            foreach (var kv in purchaseParams) {
+                queryString = queryString + $"{HttpUtility.UrlEncode(kv.Key)}={HttpUtility.UrlEncode(kv.Value.ToString())}&";
+            }
+
+            var uriBuilder = new UriBuilder("https://pay.c14.money/");
+            uriBuilder.Query = queryString.ToString();
+            return uriBuilder.Uri.ToString();
+        }
+
 
         // PRIVATE METHODS
 
