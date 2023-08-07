@@ -202,7 +202,7 @@ namespace BladeLabs.UnitySDK
             }
         }
 
-        public async Task<bool> contractCallQueryFunction(
+        public async Task<ContractQueryData> contractCallQueryFunction(
             string contractId, 
             string functionName, 
             ContractFunctionParameters parameters,
@@ -210,7 +210,7 @@ namespace BladeLabs.UnitySDK
             string accountPrivateKey, 
             uint gas, 
             uint fee,
-            List<string> paramsListreturnTypes
+            List<string> returnTypes
         ) {
             if (fee > 0) {
                 string nodeAccountId = "0.0.3";            
@@ -219,21 +219,19 @@ namespace BladeLabs.UnitySDK
                     .UnwrapIfPromise()
                     .ToString();
                 DelayedQueryCall delayedQueryCall = this.processResponse<DelayedQueryCall>(delayedQueryCallResponse);
-
                 
-
-                Debug.Log(
-                    await apiService.executeDelayedQueryCall(delayedQueryCall)
-                );
-                // make response similar to BladeApi
-                // parse response
-                // process response on JS side
-                // return data structs like on Kotlin/Swift SDK
+                DelayedQueryCallResult delayedQueryCallResult = await apiService.executeDelayedQueryCall(delayedQueryCall);
+                
+                string contractCallQueryResponse = engine
+                    .Evaluate($"window.bladeSdk.parseContractCallQueryResponse('{contractId}', '{delayedQueryCallResult.contractFunctionResult.gasUsed}', '{delayedQueryCallResult.rawResult}', ['{string.Join("', '", returnTypes)}'])")
+                    .UnwrapIfPromise()
+                    .ToString();
+                ContractQueryData contractQueryData = this.processResponse<ContractQueryData>(contractCallQueryResponse);
+                return contractQueryData;
             } else {
                 // blade pay fee 
+                throw new BladeSDKException("Error", "free queries not implemented yet");
             }
-            
-            return false;
         }
 
         // PRIVATE METHODS

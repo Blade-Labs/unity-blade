@@ -277,7 +277,7 @@ Debug.Log($"isQuery = {contractCallQuery}, rawResponse = {content}");
         }
 
         
-        public async Task<ExecuteTxReceipt> executeDelayedQueryCall(DelayedQueryCall delayedQueryCall) {
+        public async Task<DelayedQueryCallResult> executeDelayedQueryCall(DelayedQueryCall delayedQueryCall) {
             using (HttpClient httpClient = new HttpClient()) {
                 try {
                     string body = JsonUtility.ToJson(delayedQueryCall);
@@ -285,8 +285,7 @@ Debug.Log($"isQuery = {contractCallQuery}, rawResponse = {content}");
                     HttpResponseMessage response = await httpClient.PostAsync(getSdkApi("/signer/query"), bodyContent);
                     string content = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode) {
-                        // TODO describe data class 
-                        var responseObject = JsonUtility.FromJson<ExecuteTxReceipt>(content);
+                        var responseObject = JsonUtility.FromJson<DelayedQueryCallResult>(content);
                         return responseObject;
                     } else {
                         throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);

@@ -63,7 +63,7 @@ namespace BladeLabs.UnitySDK.Samples
 
             // contract call
             // ContractFunctionParameters parameters = new ContractFunctionParameters();
-            // parameters.addString("Hello Unity SDK");
+            // parameters.addString("Hello Unity SDK [self pay]");
             // Debug.Log(
             //     await bladeSdk.contractCallFunction(
             //         "0.0.416245", 
@@ -79,7 +79,7 @@ namespace BladeLabs.UnitySDK.Samples
 
             // contract call (Blade pay fee)
             // ContractFunctionParameters parameters = new ContractFunctionParameters();
-            // parameters.addString("Hello Unity SDK");
+            // parameters.addString("Hello Unity SDK [Blade pay]");
             // Debug.Log(
             //     await bladeSdk.contractCallFunction(
             //         "0.0.416245", 
@@ -93,7 +93,7 @@ namespace BladeLabs.UnitySDK.Samples
             // );
 
 
-            // contract call query 
+            // contract call query (self pay)
             Debug.Log(
                 await bladeSdk.contractCallQueryFunction(
                     "0.0.416245", 

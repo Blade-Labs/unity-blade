@@ -362,4 +362,45 @@ namespace BladeLabs.UnitySDK {
             return $@"{{queryHex = {queryHex}, signedBuffers = [{string.Join(", ", signedBuffers)}], sharedTimestamp = {sharedTimestamp}, nodeAccountId = {nodeAccountId}, publicKey = {publicKey}, accountId = {accountId}, fee = {fee}, network = {network}}}";
         }
     }
+
+    [Serializable]
+    public class ContractFunctionResult {
+        public string contractId;
+        public ulong gasUsed;
+
+        public override string ToString() {
+            return $@"{{contractId = {contractId}, gasUsed = {gasUsed}}}";
+        }
+    }
+
+    [Serializable]
+    public class DelayedQueryCallResult {
+        public string rawResult;
+        public ContractFunctionResult contractFunctionResult;
+        
+        public override string ToString() {
+            return $@"{{rawResult = {rawResult}, contractFunctionResult = {contractFunctionResult}}}";
+        }
+    }
+
+    [Serializable]
+    public class ContractQueryData {
+        public ulong gasUsed;
+        public List<ContractQueryRecord> values;
+
+        public override string ToString() {
+            return $@"{{gasUsed = {gasUsed}, values = [{string.Join(", ", values)}]}}";
+        }
+    }
+
+    [Serializable]
+    public class ContractQueryRecord {
+        public string type;
+        public string value;
+
+        public override string ToString() {
+            return $@"{{type = {type}, value = {value}}}";
+        }
+    }
+
 }
