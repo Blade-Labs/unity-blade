@@ -108,10 +108,17 @@ namespace BladeLabs.UnitySDK.Samples
             // );
 
             // C14 url
-            Debug.Log(
-                await bladeSdk.getC14url("karate", "0.0.123456", "1234")
-            );
+            // Debug.Log(
+            //     await bladeSdk.getC14url("karate", "0.0.123456", "1234")
+            // );
             
+            // sign
+            // Debug.Log(
+            //     // await bladeSdk.sign("aGVsbG8=", "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", "base64")
+            //     await bladeSdk.sign("hello", "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", "utf8")
+            // );
+            // Debug.Log("signedMessage: '27cb9d51434cf1e76d7ac515b19442c619f641e6fccddbf4a3756b14466becb6992dc1d2a82268018147141fc8d66ff9ade43b7f78c176d070a66372d655f942'");
+
 
 
 

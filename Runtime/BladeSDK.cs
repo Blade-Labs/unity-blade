@@ -18,14 +18,13 @@ using System.Web;
 
     TODO: get from BladeConfig nodeAccountId = "0.0.3";
 
-    // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
-    // TODO: deleteAccount(deleteAccountId: string, deletePrivateKey: string, transferAccountId: string, operatorAccountId: string, operatorPrivateKey: string, completionKey?: string): Promise<TransactionReceipt>
-    // TODO: sign(messageString: string, privateKey: string, completionKey?: string): Promise<SignMessageData> {
     // TODO: signVerify(messageString: string, signature: string, publicKey: string, completionKey?: string): Promise<SignVerifyMessageData> {
     // TODO: hethersSign(messageString: string, privateKey: string, completionKey?: string): Promise<SignMessageData>
     // TODO: splitSignature(signature: string, completionKey?: string): Promise<SplitSignatureData> {
     // TODO: async getParamsSignature(paramsEncoded: string | ParametersBuilder, privateKey: string, completionKey?: string): Promise<SplitSignatureData> {
     // TODO: getTransactions(accountId: string, transactionType: string = "", nextPage: string, transactionsLimit: string = "10", completionKey?: string): Promise<TransactionsHistoryData> {
+    // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
+    // TODO: deleteAccount(deleteAccountId: string, deletePrivateKey: string, transferAccountId: string, operatorAccountId: string, operatorPrivateKey: string, completionKey?: string): Promise<TransactionReceipt>
 */
         
 namespace BladeLabs.UnitySDK
@@ -285,6 +284,18 @@ namespace BladeLabs.UnitySDK
             return uriBuilder.Uri.ToString();
         }
 
+        public async Task<SignMessageData> sign(
+            string messageEncodedBase64, 
+            string accountPrivateKey,
+            string encoding // hex|base64|utf8
+        ) {
+            string signMessageReponse = engine
+                .Evaluate($"window.bladeSdk.sign('{messageEncodedBase64}', '{accountPrivateKey}', '{encoding}')")
+                .UnwrapIfPromise()
+                .ToString();
+            SignMessageData signMessageData = this.processResponse<SignMessageData>(signMessageReponse);
+            return signMessageData;
+        }
 
         // PRIVATE METHODS
 

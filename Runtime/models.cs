@@ -412,4 +412,12 @@ namespace BladeLabs.UnitySDK {
         }
     }
 
+    [Serializable]
+    public class SignMessageData {
+        public string signedMessage;
+
+        public override string ToString() {
+            return $@"{{signedMessage = {signedMessage}}}";
+        }
+    }
 }
