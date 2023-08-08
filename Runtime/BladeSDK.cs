@@ -12,7 +12,6 @@ using System.Web;
 /**
     Mnemonic not supported:
         - no `getKeysFromMnemonic` method
-        - no `hethersSign(messageEncoded, accountPrivateKey, encoding)` method, only `sign(messageEncoded, accountPrivateKey, encoding)`
         - `createAccount` not returning mnemonic
 
     TODO: handle errors from remote signer server 
@@ -306,6 +305,19 @@ namespace BladeLabs.UnitySDK
                 .ToString();
             SignVerifyMessageData signVerifyMessageData = this.processResponse<SignVerifyMessageData>(signVerifyMessageResponse);
             return signVerifyMessageData.valid;
+        }
+
+        public async Task<SignMessageData> hethersSign(
+            string messageEncoded, 
+            string accountPrivateKey,
+            string encoding // hex|base64|utf8
+        ) {
+            string signMessageReponse = engine
+                .Evaluate($"window.bladeSdk.hethersSign('{messageEncoded}', '{accountPrivateKey}', '{encoding}')")
+                .UnwrapIfPromise()
+                .ToString();
+            SignMessageData signMessageData = this.processResponse<SignMessageData>(signMessageReponse);
+            return signMessageData;
         }
 
         public async Task<SplitSignatureData> splitSignature(string signature) {

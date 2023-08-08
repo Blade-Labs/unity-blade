@@ -125,21 +125,25 @@ namespace BladeLabs.UnitySDK.Samples
             // Debug.Log(await bladeSdk.signVerify("aGVsbG8=", "27cb9d51434cf1e76d7ac515b19442c619f641e6fccddbf4a3756b14466becb6992dc1d2a82268018147141fc8d66ff9ade43b7f78c176d070a66372d655f942", "302d300706052b8104000a032200029dc73991b0d9cdbb59b2cd0a97a0eaff6de801726cb39804ea9461df6be2dd30", "base64"));
             // Debug.Log(await bladeSdk.signVerify("signature will not match", "27cb9d51434cf1e76d7ac515b19442c619f641e6fccddbf4a3756b14466becb6992dc1d2a82268018147141fc8d66ff9ade43b7f78c176d070a66372d655f942", "302d300706052b8104000a032200029dc73991b0d9cdbb59b2cd0a97a0eaff6de801726cb39804ea9461df6be2dd30", "utf8"));
 
+            // hethersSign
+            Debug.Log(await bladeSdk.hethersSign("hello", "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b", "utf8"));
+            Debug.Log("0x25de7c26ecfa4f28d8b96a95cf58ea7088a72a66b311c796090cb4c7d58c11217b4a7b174b4c31b90c3babb00958b2120274380404c4f1196abe3614df3741561b");
+
             // splitSignature
             // Debug.Log(await bladeSdk.splitSignature("0x25de7c26ecfa4f28d8b96a95cf58ea7088a72a66b311c796090cb4c7d58c11217b4a7b174b4c31b90c3babb00958b2120274380404c4f1196abe3614df3741561b"));
             // Debug.Log("v: 27, r: '0x25de7c26ecfa4f28d8b96a95cf58ea7088a72a66b311c796090cb4c7d58c1121', s: '0x7b4a7b174b4c31b90c3babb00958b2120274380404c4f1196abe3614df374156'");
   
 
             // getParamsSignature
-            ContractFunctionParameters parameters = new ContractFunctionParameters();
-            parameters
-                .addAddress("0.0.346533")
-                .addUInt64Array(new List<ulong> {300000, 300000})
-                .addUInt64Array(new List<ulong> {6})
-                .addUInt64Array(new List<ulong> {2})
-            ;
-            Debug.Log(await bladeSdk.getParamsSignature(parameters, "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b"));
-            Debug.Log("v: 28, r: '0xe5e662d0564828fd18b2b5b228ade288ad063fadca76812f7902f56cae3e678e', s: '0x61b7ceb82dc6695872289b697a1bca73b81c494288abda29fa022bb7b80c84b5'");
+            // ContractFunctionParameters parameters = new ContractFunctionParameters();
+            // parameters
+            //     .addAddress("0.0.346533")
+            //     .addUInt64Array(new List<ulong> {300000, 300000})
+            //     .addUInt64Array(new List<ulong> {6})
+            //     .addUInt64Array(new List<ulong> {2})
+            // ;
+            // Debug.Log(await bladeSdk.getParamsSignature(parameters, "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b"));
+            // Debug.Log("v: 28, r: '0xe5e662d0564828fd18b2b5b228ade288ad063fadca76812f7902f56cae3e678e', s: '0x61b7ceb82dc6695872289b697a1bca73b81c494288abda29fa022bb7b80c84b5'");
 
         }
     }
