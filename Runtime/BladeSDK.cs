@@ -19,7 +19,6 @@ using System.Web;
 
     TODO: get from BladeConfig nodeAccountId = "0.0.3";
 
-    // TODO: splitSignature(signature: string, completionKey?: string): Promise<SplitSignatureData> {
     // TODO: async getParamsSignature(paramsEncoded: string | ParametersBuilder, privateKey: string, completionKey?: string): Promise<SplitSignatureData> {
     // TODO: getTransactions(accountId: string, transactionType: string = "", nextPage: string, transactionsLimit: string = "10", completionKey?: string): Promise<TransactionsHistoryData> {
     // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
@@ -308,6 +307,15 @@ namespace BladeLabs.UnitySDK
                 .ToString();
             SignVerifyMessageData signVerifyMessageData = this.processResponse<SignVerifyMessageData>(signVerifyMessageResponse);
             return signVerifyMessageData.valid;
+        }
+
+        public async Task<SplitSignatureData> splitSignature(string signature) {
+            string splitSignatureResponse = engine
+                .Evaluate($"window.bladeSdk.splitSignature('{signature}')")
+                .UnwrapIfPromise()
+                .ToString();
+            SplitSignatureData splitSignatureData = this.processResponse<SplitSignatureData>(splitSignatureResponse);
+            return splitSignatureData;
         }
 
         // PRIVATE METHODS

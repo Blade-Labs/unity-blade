@@ -430,5 +430,14 @@ namespace BladeLabs.UnitySDK {
         }
     }
 
-    
+    [Serializable]
+    public class SplitSignatureData {
+        public int v;
+        public string r;
+        public string s;
+
+        public override string ToString() {
+            return $@"{{v = {v}, r = {r}, s = {s}}}";
+        }
+    }    
 }
