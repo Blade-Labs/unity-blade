@@ -12,14 +12,13 @@ using System.Web;
 /**
     Mnemonic not supported:
         - no `getKeysFromMnemonic` method
+        - no `hethersSign(messageEncoded, accountPrivateKey, encoding)` method, only `sign(messageEncoded, accountPrivateKey, encoding)`
         - `createAccount` not returning mnemonic
 
     TODO: handle errors from remote signer server 
 
     TODO: get from BladeConfig nodeAccountId = "0.0.3";
 
-    // TODO: signVerify(messageString: string, signature: string, publicKey: string, completionKey?: string): Promise<SignVerifyMessageData> {
-    // TODO: hethersSign(messageString: string, privateKey: string, completionKey?: string): Promise<SignMessageData>
     // TODO: splitSignature(signature: string, completionKey?: string): Promise<SplitSignatureData> {
     // TODO: async getParamsSignature(paramsEncoded: string | ParametersBuilder, privateKey: string, completionKey?: string): Promise<SplitSignatureData> {
     // TODO: getTransactions(accountId: string, transactionType: string = "", nextPage: string, transactionsLimit: string = "10", completionKey?: string): Promise<TransactionsHistoryData> {
