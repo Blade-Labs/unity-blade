@@ -285,16 +285,30 @@ namespace BladeLabs.UnitySDK
         }
 
         public async Task<SignMessageData> sign(
-            string messageEncodedBase64, 
+            string messageEncoded, 
             string accountPrivateKey,
             string encoding // hex|base64|utf8
         ) {
             string signMessageReponse = engine
-                .Evaluate($"window.bladeSdk.sign('{messageEncodedBase64}', '{accountPrivateKey}', '{encoding}')")
+                .Evaluate($"window.bladeSdk.sign('{messageEncoded}', '{accountPrivateKey}', '{encoding}')")
                 .UnwrapIfPromise()
                 .ToString();
             SignMessageData signMessageData = this.processResponse<SignMessageData>(signMessageReponse);
             return signMessageData;
+        }
+
+        public async Task<bool> signVerify(
+            string messageEncoded, 
+            string signatureHex,
+            string publicKey, // hex-encoded public key with DER header
+            string encoding // hex|base64|utf8
+        ) {
+            string signVerifyMessageResponse = engine
+                .Evaluate($"window.bladeSdk.signVerify('{messageEncoded}', '{signatureHex}', '{publicKey}', '{encoding}')")
+                .UnwrapIfPromise()
+                .ToString();
+            SignVerifyMessageData signVerifyMessageData = this.processResponse<SignVerifyMessageData>(signVerifyMessageResponse);
+            return signVerifyMessageData.valid;
         }
 
         // PRIVATE METHODS

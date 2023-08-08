@@ -420,4 +420,15 @@ namespace BladeLabs.UnitySDK {
             return $@"{{signedMessage = {signedMessage}}}";
         }
     }
+
+    [Serializable]
+    public class SignVerifyMessageData {
+        public bool valid;
+
+        public override string ToString() {
+            return $@"{{valid = {valid}}}";
+        }
+    }
+
+    
 }
