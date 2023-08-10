@@ -1,7 +1,9 @@
 using UnityEngine;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BladeLabs.UnitySDK
 {
@@ -74,6 +76,75 @@ namespace BladeLabs.UnitySDK
                     }
                 } catch (HttpRequestException ex) {
                     throw new BladeSDKException($"HttpRequestException", ex.Message);
+                }
+            }
+        }
+
+        public async Task<TransactionsHistoryData> getTransactionsFrom(
+            string accountId,
+            string transactionType,
+            string nextPage,
+            int transactionsLimit
+        ) {
+            int pageLimit = transactionsLimit >= 100 ? 100 : 25;
+            List<TransactionData> result = new List<TransactionData>();
+        
+            while (result.Count < transactionsLimit) {
+                string url = string.IsNullOrEmpty(nextPage) ? $"/api/v1/transactions/?account.id={accountId}&limit={pageLimit}" : nextPage;
+                var info = await GET<TransactionsHistoryRaw>(url);
+                Dictionary<string, List<TransactionData>> groupedTransactions = new Dictionary<string, List<TransactionData>>();
+
+                var tasks = info.transactions.Select(async t => {
+                    if (!groupedTransactions.ContainsKey(t.transaction_id)) {
+                        groupedTransactions[t.transaction_id] = new List<TransactionData>();
+                    }
+                    groupedTransactions[t.transaction_id].AddRange(
+                        TransactionUtils.formatTransactionData(
+                            await GET<TransactionsHistoryRaw>($"/api/v1/transactions/{t.transaction_id}"),
+                            accountId
+                        )
+                    );
+                });
+                await Task.WhenAll(tasks);
+
+                List<TransactionData> transactions = groupedTransactions.Values
+                    .SelectMany(dataList => dataList)
+                    .OrderByDescending(t => ((DateTimeOffset)t.time).ToUnixTimeSeconds())
+                    .ToList();
+
+                // Debug.Log($"raw trans = [{string.Join(", ", transactions)}]");
+                transactions = TransactionUtils.filterAndFormatTransactions(transactions, transactionType);
+                // Debug.Log($"filtered trans = [{string.Join(", ", transactions)}]");
+
+                result.AddRange(transactions);   
+
+                nextPage = info.links?.next ?? null;
+                if (string.IsNullOrEmpty(nextPage)) {
+                    Debug.Log($"OutOfRecords:");
+                    break;
+                }
+            }
+
+            return new TransactionsHistoryData {
+                transactions = result,
+                nextPage = nextPage
+            };       
+        }
+
+        public async Task<T> GET<T>(string endpoint) {
+            // Debug.Log($"GET({endpoint})");
+            using (HttpClient httpClient = new HttpClient()) {
+                try {
+                    HttpResponseMessage response = await httpClient.GetAsync(getMirrorNodeUrl(endpoint));
+                    string content = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode) {
+                        var responseObject = JsonUtility.FromJson<T>(content);
+                        return responseObject;
+                    } else {
+                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
+                    }
+                } catch (HttpRequestException ex) {
+                    throw new BladeSDKException("HttpRequestException", ex.Message);
                 }
             }
         }

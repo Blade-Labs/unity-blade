@@ -440,4 +440,121 @@ namespace BladeLabs.UnitySDK {
             return $@"{{v = {v}, r = {r}, s = {s}}}";
         }
     }    
+
+    [Serializable]
+    public class TransactionsHistoryData {
+        public List<TransactionData> transactions;
+        public string nextPage;
+
+        public override string ToString() {
+            return $@"{{nextPage = {nextPage}, transactions = [{string.Join(", ", transactions)}]}}";
+        }
+    }
+
+    [Serializable]
+    public class TransactionData {
+        public string transactionId;
+        public string type;
+        public DateTime time;
+        public List<TransferData> transfers;
+        public List<TransferData> nftTransfers;// TODO create valid model here
+        public string memo;
+        public ulong fee;
+        public bool showDetailed;
+        public TransactionPlainData plainData;
+        public string consensusTimestamp;
+
+        public override string ToString() {
+            return $@"{{transactionId = {transactionId}, type = {type}, time = {time}, transfers = [{string.Join(", ", transfers)}], memo = {memo}, fee = {fee}, showDetailed = {showDetailed}, plainData = {plainData}, consensusTimestamp = {consensusTimestamp}}}";            
+        }
+    }
+
+    [Serializable]
+    public class TransferData {
+        public double amount;
+        public string account;
+        public string token_id;
+
+        public override string ToString() {
+            return $@"{{amount = {amount}, account = {account}, token_id = {token_id}}}";
+        }
+    }
+
+    [Serializable]
+    public class TransactionPlainData {
+        public string type;
+        public string token_id;
+        public string account;
+        public double amount; // TODO type??
+
+        public override string ToString() {
+            return $@"{{type = {type}, token_id = {token_id}, account = {account}, amount = {amount}}}";
+        }
+    }
+
+    [Serializable]
+    public class TransactionsHistoryRaw {
+        public List<TransactionRaw> transactions;
+        public Links links;
+
+        public override string ToString() {
+            return $@"{{links = {links}, transactions = [{string.Join(", ", transactions)}]}}";
+        }
+    }
+
+    [Serializable]
+    public class Links {
+        public string next;
+
+        public override string ToString() {
+            return $@"{{next = {next}}}";
+        }
+    }
+
+    [Serializable]
+    public class TransactionRaw {
+        // "bytes":null,
+        public ulong charged_tx_fee;
+        public string consensus_timestamp;
+        // "entity_id":null,
+        public string max_fee;
+        public string memo_base64;
+        public string name;
+        public List<TransfersRaw> nft_transfers; // TODO describe valid model
+        public string node;
+        public ulong nonce;
+        // "parent_consensus_timestamp":null,
+        public string result;
+        public bool scheduled;
+        // "staking_reward_transfers":[],
+        public List<TransfersRaw> token_transfers;
+        public string transaction_hash;
+        public string transaction_id;
+        public List<TransfersRaw> transfers;
+        public string valid_duration_seconds;
+        public string valid_start_timestamp;
+
+        public override string ToString() {
+            return $@"{{charged_tx_fee = {charged_tx_fee}, consensus_timestamp = {consensus_timestamp}, max_fee = {max_fee}, memo_base64 = {memo_base64}, name = {name}, node = {node}, nonce = {nonce}, result = {result}, scheduled = {scheduled}, transaction_hash = {transaction_hash}, transaction_id = {transaction_id}, token_transfers = [{string.Join(", ", token_transfers)}], transfers = [{string.Join(", ", transfers)}], valid_duration_seconds = {valid_duration_seconds}, valid_start_timestamp = {valid_start_timestamp}}}";
+        }    
+    }
+    
+    [Serializable]
+    public class TransfersRaw {
+        
+        public string account; //"0.0.3"
+        public ulong amount; //6777,
+        public bool is_approval; //false
+        public string token_id;
+
+        public override string ToString() {
+            return $@"{{account = {account}, amount = {amount}, is_approval = {is_approval}}}";
+        }
+    }
+
+
+
+
+
+
 }

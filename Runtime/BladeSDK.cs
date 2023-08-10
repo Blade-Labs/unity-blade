@@ -15,10 +15,13 @@ using System.Web;
         - `createAccount` not returning mnemonic
 
     TODO: handle errors from remote signer server 
-
     TODO: get from BladeConfig nodeAccountId = "0.0.3";
 
-    // TODO: getTransactions(accountId: string, transactionType: string = "", nextPage: string, transactionsLimit: string = "10", completionKey?: string): Promise<TransactionsHistoryData> {
+    TODO: implement TransactionUtils.filterAndFormatTransactions
+    TODO: replace couple methods of ApiService methods with GET
+
+
+    // WIP: getTransactions(accountId: string, transactionType: string = "", nextPage: string, transactionsLimit: string = "10", completionKey?: string): Promise<TransactionsHistoryData> {
     // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
     // TODO: deleteAccount(deleteAccountId: string, deletePrivateKey: string, transferAccountId: string, operatorAccountId: string, operatorPrivateKey: string, completionKey?: string): Promise<TransactionReceipt>
 */
@@ -226,7 +229,6 @@ namespace BladeLabs.UnitySDK
             }
         }
 
-
         public async Task<string> getC14url(
             string asset,
             string account,
@@ -341,9 +343,12 @@ namespace BladeLabs.UnitySDK
             return splitSignatureData;
         }
 
+        public async Task<TransactionsHistoryData> getTransactions(string accountId, string transactionType, string nextPage, int transactionsLimit) {
+            TransactionsHistoryData transactionsHistoryData = await apiService.getTransactionsFrom(accountId, transactionType, nextPage, transactionsLimit);
+            return transactionsHistoryData;
+        }
 
         // PRIVATE METHODS
-
         private SignedTx signTransaction(string transactionBytes, string encoding, string accountPrivateKey) {
             string signedTxResponse = engine
                 .Evaluate($"window.bladeSdk.signTransaction('{transactionBytes}', '{encoding}', '{accountPrivateKey}')")
