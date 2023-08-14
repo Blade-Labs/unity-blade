@@ -30,9 +30,12 @@ namespace BladeLabs.UnitySDK {
 
 
         public static List<TransactionData> filterAndFormatTransactions(List<TransactionData> transactions, string transactionType) {
-            // TODO implement it
-            
-            return transactions;
+            if (string.IsNullOrEmpty(transactionType)) {
+                return transactions;
+            }
+            return transactions
+                .Where(tx => tx.type == transactionType)
+                .ToList();
         }
     }
 }
