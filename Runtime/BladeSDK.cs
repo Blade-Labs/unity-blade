@@ -16,12 +16,8 @@ using System.Web;
 
     TODO: handle errors from remote signer server 
     TODO: get from BladeConfig nodeAccountId = "0.0.3";
+    TODO: contractCallQueryFunction free calls
 
-    TODO: implement TransactionUtils.filterAndFormatTransactions
-    TODO: replace couple methods of ApiService methods with GET
-
-
-    // WIP: getTransactions(accountId: string, transactionType: string = "", nextPage: string, transactionsLimit: string = "10", completionKey?: string): Promise<TransactionsHistoryData> {
     // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
     // TODO: deleteAccount(deleteAccountId: string, deletePrivateKey: string, transferAccountId: string, operatorAccountId: string, operatorPrivateKey: string, completionKey?: string): Promise<TransactionReceipt>
 */
@@ -72,7 +68,8 @@ namespace BladeLabs.UnitySDK
         }
 
         public async Task<AccountInfoData> getAccountInfo(string accountId) {
-            var account = await apiService.getAccount(accountId);
+            var account = await apiService.GET<AccountData>($"/api/v1/accounts/{accountId}");
+
             string response = engine
                 .Evaluate($"window.bladeSdk.getAccountInfo('{accountId}', '{account.evm_address}', '{account.key.key}')")
                 .UnwrapIfPromise()
@@ -96,7 +93,7 @@ namespace BladeLabs.UnitySDK
         }
 
         public async Task<ExecuteTxReceipt> transferTokens(string tokenId, string accountId, string accountPrivateKey, string recieverAccount, string amount, string memo, bool freeTransfer = false) {
-            TokenData meta = await apiService.requestTokenInfo(tokenId);
+            TokenData meta = await apiService.GET<TokenData>($"/api/v1/tokens/{tokenId}");
             double correctedAmount = double.Parse(amount) * Math.Pow(10, int.Parse(meta.decimals));
             
             if (freeTransfer == true) {

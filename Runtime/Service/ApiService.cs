@@ -46,40 +46,6 @@ namespace BladeLabs.UnitySDK
             return host + route;
         }
 
-        public async Task<AccountData> getAccount(string accountId) {
-            using (HttpClient httpClient = new HttpClient()) {
-                try {
-                    HttpResponseMessage response = await httpClient.GetAsync(getMirrorNodeUrl($"/api/v1/accounts/{accountId}"));
-                    string content = await response.Content.ReadAsStringAsync();
-                    if (response.IsSuccessStatusCode) {
-                        var responseObject = JsonUtility.FromJson<AccountData>(content);
-                        return responseObject;
-                    } else {
-                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
-                    }
-                } catch (HttpRequestException ex) {
-                    throw new BladeSDKException($"HttpRequestException", ex.Message);
-                }
-            }
-        }
-
-        public async Task<TokenData> requestTokenInfo(string tokenId) {
-            using (HttpClient httpClient = new HttpClient()) {
-                try {
-                    HttpResponseMessage response = await httpClient.GetAsync(getMirrorNodeUrl($"/api/v1/tokens/{tokenId}"));
-                    string content = await response.Content.ReadAsStringAsync();
-                    if (response.IsSuccessStatusCode) {
-                        var responseObject = JsonUtility.FromJson<TokenData>(content);
-                        return responseObject;
-                    } else {
-                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
-                    }
-                } catch (HttpRequestException ex) {
-                    throw new BladeSDKException($"HttpRequestException", ex.Message);
-                }
-            }
-        }
-
         public async Task<TransactionsHistoryData> getTransactionsFrom(
             string accountId,
             string transactionType,
@@ -335,7 +301,7 @@ Debug.Log($"isQuery = {contractCallQuery}, rawResponse = {content}");
         }
 
         public async Task<AccountBalanceData> getBalance(string accountId) {
-            var account = await this.getAccount(accountId);
+            var account = await GET<AccountData>($"/api/v1/accounts/{accountId}");
             var tokens = await this.getAccountTokens(accountId);            
             
             return new AccountBalanceData {
