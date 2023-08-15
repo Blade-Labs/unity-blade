@@ -15,11 +15,11 @@ using System.Web;
         - `createAccount` not returning mnemonic
 
     TODO: handle errors from remote signer server 
-    TODO: get from BladeConfig nodeAccountId = "0.0.3";
-    TODO: contractCallQueryFunction free calls
-
-    // TODO: getPendingAccount(transactionId: string, mnemonic: string, completionKey?: string): Promise<CreateAccountData> {
-    // TODO: deleteAccount(deleteAccountId: string, deletePrivateKey: string, transferAccountId: string, operatorAccountId: string, operatorPrivateKey: string, completionKey?: string): Promise<TransactionReceipt>
+    TODO: [backend] get from BladeConfig nodeAccountId = "0.0.3";
+    TODO: [backend] contractCallQueryFunction free calls
+    TODO: [backend] alternative to visitorId
+    TODO: e2e test
+    TODO: [postponed] getPendingAccount(transactionId: string, mnemonic: string)
 */
         
 namespace BladeLabs.UnitySDK
@@ -164,6 +164,15 @@ namespace BladeLabs.UnitySDK
                 evmAddress = keyPairData.evmAddress
             };
             return createAccountData;
+        }
+
+        public async Task<ExecuteTxReceipt> deleteAccount(string deleteAccountId, string deletePrivateKey, string transferAccountId, string operatorAccountId, string operatorPrivateKey) {
+            string signedTxResponse = engine
+                .Evaluate($"window.bladeSdk.deleteAccount('{deleteAccountId}', '{deletePrivateKey}', '{transferAccountId}', '{operatorAccountId}', '{operatorPrivateKey}')")
+                .UnwrapIfPromise()
+                .ToString();
+            SignedTx signedTx = this.processResponse<SignedTx>(signedTxResponse);
+            return await apiService.executeTx(signedTx.tx, signedTx.network);
         }
 
         public async Task<ExecuteTxReceipt> contractCallFunction(string contractId, string functionName, ContractFunctionParameters parameters, string accountId, string accountPrivateKey, uint gas, bool bladePayFee = false) {

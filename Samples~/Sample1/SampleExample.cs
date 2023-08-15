@@ -61,6 +61,20 @@ namespace BladeLabs.UnitySDK.Samples
                 // await bladeSdk.createAccount("some device id string, if required")
             // );
 
+            // delete account
+            CreateAccountData accountOperator = new CreateAccountData {accountId = "0.0.346533", privateKey = "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b"};
+            CreateAccountData accountToDelete = new CreateAccountData {accountId = "0.0.486856", privateKey = "3030020100300706052b8104000a04220420ff3ee87eac8651f1aca58570b7aa33b1809bd956f13734d29767e97385cb9f15"};
+
+            Debug.Log(
+                await bladeSdk.deleteAccount(
+                    accountToDelete.accountId,
+                    accountToDelete.privateKey,
+                    accountOperator.accountId, // transferAccountId
+                    accountOperator.accountId,
+                    accountOperator.privateKey
+                )
+            );
+
             // contract call
             // ContractFunctionParameters parameters = new ContractFunctionParameters();
             // parameters.addString("Hello Unity SDK [self pay]");
