@@ -14,10 +14,9 @@ using System.Web;
         - no `getKeysFromMnemonic` method
         - `createAccount` not returning mnemonic
 
-    TODO: handle errors from remote signer server 
+    TODO: [backend] alternative to visitorId
     TODO: [backend] get from BladeConfig nodeAccountId = "0.0.3";
     TODO: [backend] contractCallQueryFunction free calls
-    TODO: [backend] alternative to visitorId
     TODO: e2e test
     TODO: [postponed] getPendingAccount(transactionId: string, mnemonic: string)
 */

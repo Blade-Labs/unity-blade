@@ -1,0 +1,11 @@
+{
+    "name": "BladeLabs.UnitySDK.Tests",
+    "references": [
+        "BladeLabs.UnitySDK"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}
