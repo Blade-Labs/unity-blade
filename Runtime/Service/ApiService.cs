@@ -240,8 +240,8 @@ namespace BladeLabs.UnitySDK
                     string content = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode) {
 
-// TODO REMOVE. Debugging contractCallQuery 
-Debug.Log($"isQuery = {contractCallQuery}, rawResponse = {content}");
+                    // // TODO REMOVE. Debugging contractCallQuery 
+                    // Debug.Log($"isQuery = {contractCallQuery}, rawResponse = {content}");
 
                         var responseObject = JsonUtility.FromJson<SignContractCallResponse>(content);
                         return responseObject;

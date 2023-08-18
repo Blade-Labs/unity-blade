@@ -33,11 +33,11 @@ namespace BladeLabs.UnitySDK.Samples
             // transfer tokens
             // Debug.Log(
             //     await bladeSdk.transferTokens(
-            //         "0.0.416487",
+            //         "0.0.433870",
             //         "0.0.346533",
             //         "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b",
             //         "0.0.346530",
-            //          "0.12345678",
+            //          "1",
             //         "unity-sdk-paid-token-transfer",
             //         false
             //     )
@@ -46,19 +46,19 @@ namespace BladeLabs.UnitySDK.Samples
             // free transfer tokens
             // Debug.Log(
             //     await bladeSdk.transferTokens(
-            //         "0.0.416487",
+            //         "0.0.433870", /// token id assigned on server side for dAppCode
             //         "0.0.346533",
             //         "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b",
             //         "0.0.346530",
-            //          "0.12345678",
+            //          "1",
             //         "unity-sdk-free-token-transfer",
             //         true
             //     )
             // );
             
             // create account (without mnemonic)
-            //  Debug.Log(
-                // await bladeSdk.createAccount("some device id string, if required")
+            // Debug.Log(
+            //     await bladeSdk.createAccount("some device id string, if required")
             // );
 
             // delete account
