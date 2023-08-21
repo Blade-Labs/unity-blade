@@ -87,7 +87,6 @@ namespace BladeLabs.UnitySDK {
 
     [Serializable]
     public class Response<T> {
-        // public string completionKey;
         public T data;
         public BladeJSError error;
     }
@@ -457,7 +456,7 @@ namespace BladeLabs.UnitySDK {
         public string type;
         public DateTime time;
         public List<TransferData> transfers;
-        public List<TransferData> nftTransfers;// TODO create valid model here
+        public List<TransactionHistoryNftTransfer> nftTransfers;
         public string memo;
         public ulong fee;
         public bool showDetailed;
@@ -493,6 +492,15 @@ namespace BladeLabs.UnitySDK {
     }
 
     [Serializable]
+    public class TransactionHistoryNftTransfer {
+        public bool is_approval;
+        public string receiver_account_id;
+        public string sender_account_id;
+        public uint serial_number;
+        public string token_id;
+    }
+
+    [Serializable]
     public class TransactionsHistoryRaw {
         public List<TransactionRaw> transactions;
         public Links links;
@@ -520,7 +528,7 @@ namespace BladeLabs.UnitySDK {
         public string max_fee;
         public string memo_base64;
         public string name;
-        public List<TransfersRaw> nft_transfers; // TODO describe valid model
+        public List<TransactionHistoryNftTransfer> nft_transfers; // TODO describe valid model
         public string node;
         public ulong nonce;
         // "parent_consensus_timestamp":null,
@@ -551,10 +559,4 @@ namespace BladeLabs.UnitySDK {
             return $@"{{account = {account}, amount = {amount}, is_approval = {is_approval}}}";
         }
     }
-
-
-
-
-
-
 }

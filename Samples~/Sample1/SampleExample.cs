@@ -22,9 +22,9 @@ namespace BladeLabs.UnitySDK.Samples
             // transfer hbars
             // Debug.Log(
             //     await bladeSdk.transferHbars(
-            //         "0.0.8172",
-            //         "3030020100300706052b8104000a042204200ce23c3a1cc9b7cd85db5fdd039491cab3d95c0065ac18f77867d33eaff5c050",
-            //         "0.0.14943230",
+            //         "0.0.346533",
+            //         "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b",
+            //         "0.0.346530",
             //         "15",
             //         "unity-sdk-test-ok"
             //     )

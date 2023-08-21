@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "description": "Hedera SDK wrapper with Blade features",
   "unity": "2019.3",
-  "documentationUrl": "https://github.com/Blade-Labs/unity-blade/blob/develop/README.md",
+  "documentationUrl": "https://github.com/Blade-Labs/unity-blade/blob/main/README.md",
   "keywords": [
     "hedera",
     "hashgraph",
@@ -17,6 +17,9 @@
     "name": "BladeLabs",
     "url": "https://bladelabs.io/"
   },
+  "contributors": [
+    "Ihor Dubii <the.gary.du@gmail.com> (https://gary.pp.ua/)"
+  ],
   "homepage": "https://bladelabs.io/",
   "repository": {
     "type": "git",
