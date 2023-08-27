@@ -43,6 +43,9 @@ namespace BladeLabs.UnitySDK
 
             this.apiService = new ApiService(network, sdkEnvironment, executeApiEndpoint, dAppCode);
 
+            // do fingerprint
+            Debug.Log($"SystemInfo.deviceUniqueIdentifier = {SystemInfo.deviceUniqueIdentifier}"); // BC238E19-6B3D-5CFC-A26A-21499FF7C25E
+
             engine = new Engine();
             engine.SetValue("console",typeof(Debug));
             engine.Execute("window = {};");
