@@ -16,12 +16,12 @@ namespace BladeLabs.UnitySDK
         private string dAppCode;
 
 
-        public ApiService(Network network, SdkEnvironment sdkEnvironment, string executeApiEndpoint, string dAppCode) {
+        public ApiService(Network network, SdkEnvironment sdkEnvironment, string executeApiEndpoint, string dAppCode, string visitorId) {
             this.network = network;
             this.sdkEnvironment = sdkEnvironment;
             this.executeApiEndpoint = executeApiEndpoint;
             // TODO replace visitorID with proper solution for this platform
-            this.visitorId = "O9LAocV5ISChRrBCtvpY";
+            this.visitorId = visitorId; //"O9LAocV5ISChRrBCtvpY";
             this.dAppCode = dAppCode;
         }
 

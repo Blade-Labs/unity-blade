@@ -32,6 +32,7 @@ namespace BladeLabs.UnitySDK
         string dAppCode;
         private SdkEnvironment sdkEnvironment;
         string sdkVersion = "Swift@0.6.0"; // "Unity@0.6.0";
+        string visitorId;
         private string executeApiEndpoint;
         
         public BladeSDK(string apiKey, Network network, string dAppCode, SdkEnvironment sdkEnvironment, string executeApiEndpoint = "http://localhost:8443") {
@@ -40,8 +41,9 @@ namespace BladeLabs.UnitySDK
             this.dAppCode = dAppCode;
             this.sdkEnvironment = sdkEnvironment;
             this.executeApiEndpoint = executeApiEndpoint;
+            this.visitorId = SystemInfo.deviceUniqueIdentifier;
 
-            this.apiService = new ApiService(network, sdkEnvironment, executeApiEndpoint, dAppCode);
+            this.apiService = new ApiService(network, sdkEnvironment, executeApiEndpoint, dAppCode, this.visitorId);
 
             // do fingerprint
             Debug.Log($"SystemInfo.deviceUniqueIdentifier = {SystemInfo.deviceUniqueIdentifier}"); // BC238E19-6B3D-5CFC-A26A-21499FF7C25E
@@ -63,7 +65,7 @@ namespace BladeLabs.UnitySDK
                 apiKey = this.apiKey,
                 dAppCode = this.dAppCode,
                 network = this.network,
-                visitorId = "[not implemented yet]",
+                visitorId = this.visitorId,
                 sdkEnvironment = this.sdkEnvironment,
                 sdkVersion = this.sdkVersion
             };

@@ -25,6 +25,15 @@
 
 ![Package manager with samples tab](img/samples.png "Package manager with samples tab")
 
+## Add to existing project
+
+To use BladeSDK you need to add reference to your .asmdef
+
+1. Select your project .asmdef file
+2. On Inpector tab go to `Assembly Definition References`
+3. Click on `+`
+4. Select `BladeLabs.UnitySDK`
+
 ## Usage
 
 Before using BladeSDK you need to create instance. Put arguments to constructor like in example. It initialize Jint engine instance and attach all required handlers to interact. Avoid using multiple instances of BladeSDK.
