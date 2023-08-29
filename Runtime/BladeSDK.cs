@@ -52,11 +52,12 @@ namespace BladeLabs.UnitySDK
             engine.SetValue("console",typeof(Debug));
             engine.Execute("window = {};");
 
-            string absolutePath = Path.GetFullPath("Packages/io.bladelabs.unity-sdk/Resources/JSUnityWrapper.bundle.js");            
-            var source = new StreamReader(absolutePath);
-            string script = source.ReadToEnd();
-            source.Close();
-            engine.Execute(script);
+            // https://docs.unity3d.com/Manual/class-TextAsset.html
+            TextAsset scriptAsset = Resources.Load<TextAsset>("JSUnityWrapper");
+            if (scriptAsset == null) {
+                throw new BladeSDKException("Error", "Can't load JSUnityWrapper");
+            }
+            engine.Execute(scriptAsset.text);
             engine.Execute($"window.bladeSdk.init('{apiKey}', '{network}', '{dAppCode}', '{sdkEnvironment}', '{sdkVersion}')");
         }
 
