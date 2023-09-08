@@ -45,9 +45,6 @@ namespace BladeLabs.UnitySDK
 
             this.apiService = new ApiService(network, sdkEnvironment, executeApiEndpoint, dAppCode, this.visitorId);
 
-            // do fingerprint
-            Debug.Log($"SystemInfo.deviceUniqueIdentifier = {SystemInfo.deviceUniqueIdentifier}"); // BC238E19-6B3D-5CFC-A26A-21499FF7C25E
-
             engine = new Engine();
             engine.SetValue("console",typeof(Debug));
             engine.Execute("window = {};");
@@ -58,7 +55,12 @@ namespace BladeLabs.UnitySDK
                 throw new BladeSDKException("Error", "Can't load JSUnityWrapper");
             }
             engine.Execute(scriptAsset.text);
-            engine.Execute($"window.bladeSdk.init('{apiKey}', '{network}', '{dAppCode}', '{sdkEnvironment}', '{sdkVersion}')");
+            engine.Execute($"window.bladeSdk.init('{apiKey}', '{network}', '{dAppCode}', '{visitorId}', '{sdkEnvironment}', '{sdkVersion}')");
+
+            string vteToken = this.getEncryptedHeader(EncryptedType.vte);
+            string tvteToken = this.getEncryptedHeader(EncryptedType.tvte);
+        
+            apiService.registerVisitor(vteToken, tvteToken);
         }
 
         public async Task<InfoData> getInfo() {
@@ -108,14 +110,10 @@ namespace BladeLabs.UnitySDK
                 // after signing - need to execute this TX
 
                 // generating TVTE token
-                string response = engine
-                    .Evaluate($"window.bladeSdk.getTvteValue()")
-                    .UnwrapIfPromise()
-                    .ToString();
-                TVTEResponse tvteResponse = this.processResponse<TVTEResponse>(response);
+                string tvteToken = this.getEncryptedHeader();
 
                 // bladeApi create and sign TX, and return base64-encoded transactionBytes
-                FreeTokenTransferResponse freeTokenTransferResponse = await apiService.freeTokenTransfer(accountId, recieverAccount, correctedAmount, memo, tvteResponse.tvte);
+                FreeTokenTransferResponse freeTokenTransferResponse = await apiService.freeTokenTransfer(accountId, recieverAccount, correctedAmount, memo, tvteToken);
 
                 // sign with sender private key
                 SignedTx signedTx = this.signTransaction(freeTokenTransferResponse.transactionBytes, "base64", accountPrivateKey);
@@ -140,7 +138,7 @@ namespace BladeLabs.UnitySDK
                 .UnwrapIfPromise()
                 .ToString();
             KeyPairData keyPairData = this.processResponse<KeyPairData>(keyResponse);
-            string tvteToken = this.getTvteToken();
+            string tvteToken = this.getEncryptedHeader();
 
             CreateAccountResponse createAccountResponse = await apiService.createAccount(keyPairData.publicKey, deviceId, tvteToken);
 
@@ -193,7 +191,7 @@ namespace BladeLabs.UnitySDK
                     contractId,
                     functionName,
                     gas,
-                    this.getTvteToken(),
+                    this.getEncryptedHeader(),
                     false
                 );
                 SignedTx signedTx = this.signTransaction(signContractCallResponse.transactionBytes, "base64", accountPrivateKey);
@@ -245,7 +243,7 @@ namespace BladeLabs.UnitySDK
             string account,
             string amount
         ) {
-            string tvteToken = this.getTvteToken();
+            string tvteToken = this.getEncryptedHeader();
             string clientId = await apiService.getC14token(tvteToken);
             
             var purchaseParams = new Dictionary<string, object> {
@@ -368,14 +366,14 @@ namespace BladeLabs.UnitySDK
             return this.processResponse<SignedTx>(signedTxResponse);
         }
 
-        private string getTvteToken() {
+        private string getEncryptedHeader(EncryptedType type = EncryptedType.tvte) {
             // generating TVTE token    
             string response = engine
-                    .Evaluate($"window.bladeSdk.getTvteValue()")
+                    .Evaluate($"window.bladeSdk.getEncryptedToken('{type}')")
                     .UnwrapIfPromise()
                     .ToString();
-            TVTEResponse tvteResponse = this.processResponse<TVTEResponse>(response);
-            return tvteResponse.tvte;
+            EncodedResponse encodedResponse = this.processResponse<EncodedResponse>(response);
+            return encodedResponse.value;
         }
 
         private T processResponse<T>(string rawJson) {

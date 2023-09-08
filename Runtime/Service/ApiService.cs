@@ -8,20 +8,17 @@ using System.Linq;
 namespace BladeLabs.UnitySDK
 {
     public class ApiService {
-
         private Network network;
         private SdkEnvironment sdkEnvironment;
         private string executeApiEndpoint;
         private string visitorId;
         private string dAppCode;
 
-
         public ApiService(Network network, SdkEnvironment sdkEnvironment, string executeApiEndpoint, string dAppCode, string visitorId) {
             this.network = network;
             this.sdkEnvironment = sdkEnvironment;
             this.executeApiEndpoint = executeApiEndpoint;
-            // TODO replace visitorID with proper solution for this platform
-            this.visitorId = visitorId; //"O9LAocV5ISChRrBCtvpY";
+            this.visitorId = visitorId;
             this.dAppCode = dAppCode;
         }
 
@@ -33,7 +30,6 @@ namespace BladeLabs.UnitySDK
             string host = this.sdkEnvironment == SdkEnvironment.Prod
                 ? "https://rest.prod.bladewallet.io/openapi/v7"
                 : "https://api.bld-dev.bladewallet.io/openapi/v7"
-                // : "https://rest.ci.bladewallet.io/openapi/v7"
             ;
 
             return host + route;
@@ -114,6 +110,35 @@ namespace BladeLabs.UnitySDK
                 }
             }
         }
+
+        public async Task<bool> registerVisitor(string vte, string xTvteApiToken) {
+            using (HttpClient httpClient = new HttpClient()) {
+                try {
+                    RegisterVisitorRequest request = new RegisterVisitorRequest {
+                        vte = vte
+                    };
+                    string body = JsonUtility.ToJson(request);
+                    HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                    
+                    httpClient.DefaultRequestHeaders.Add("X-NETWORK", this.network.ToString().ToUpper());
+                    httpClient.DefaultRequestHeaders.Add("X-VISITOR-ID", this.visitorId);
+                    httpClient.DefaultRequestHeaders.Add("X-DAPP-CODE", this.dAppCode);
+                    httpClient.DefaultRequestHeaders.Add("X-SDK-TVTE-API", xTvteApiToken);
+
+                    HttpResponseMessage response = await httpClient.PatchAsync(getApiUrl($"/%%%%%%%%%%%%%  REGISTER VISIROR URL %%%%%%%%%%%%%%%%%%"), bodyContent);
+
+                    string content = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode) {
+                        return true;
+                    } else {
+                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
+                    }
+                } catch (HttpRequestException ex) {
+                    throw new BladeSDKException($"HttpRequestException", ex.Message);
+                }
+            }
+        }
+
 
         public async Task<FreeTokenTransferResponse> freeTokenTransfer(string senderAccountId, string receiverAccountId, double amount, string memo, string xTvteApiToken) {
             using (HttpClient httpClient = new HttpClient()) {

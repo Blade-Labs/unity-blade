@@ -133,6 +133,12 @@ namespace BladeLabs.UnitySDK {
         public string publicKey;
     }
 
+
+    [Serializable]
+    public class RegisterVisitorRequest {
+        public string vte;
+    }
+
     [Serializable] 
     public class ConfirmAccountRequest {
         public string id;
@@ -185,11 +191,11 @@ namespace BladeLabs.UnitySDK {
     }
     
     [Serializable]
-    public class TVTEResponse {
-        public string tvte;
+    public class EncodedResponse {
+        public string value;
 
         public override string ToString() {
-            return $@"{{tvte = {tvte}}}";
+            return $@"{{value = {value}}}";
         }
     }
 
