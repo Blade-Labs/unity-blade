@@ -8,7 +8,7 @@ namespace BladeLabs.UnitySDK.Samples
     {
         async void Start()
         {
-            BladeSDK bladeSdk = new BladeSDK("ygUgCzRrsvhWmb3dsLcDpGnJpSZ4tk8hACmZqg9WngpuQYKdnD5m8FjfPV3XVUeB", Network.Testnet, "unitysdktest", SdkEnvironment.CI, "http://localhost:8443");
+            BladeSDK bladeSdk = new BladeSDK("Rww3x27z3Q9rrIvRQ6qGgIRppxz5e5HHPWdARyxnMXpe77WD5MW39REBXXvRZsZE", Network.Testnet, "unitysdktest", SdkEnvironment.CI, "http://localhost:8443");
 
             // get info
             // Debug.Log(await bladeSdk.getInfo());

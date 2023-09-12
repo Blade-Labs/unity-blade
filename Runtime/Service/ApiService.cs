@@ -26,10 +26,11 @@ namespace BladeLabs.UnitySDK
             return this.executeApiEndpoint + route;
         }
 
-        private string getApiUrl(string route) {
+        private string getApiUrl(string route, bool isPublic = false) {
+            string publicPath = isPublic ? "/public" : "";
             string host = this.sdkEnvironment == SdkEnvironment.Prod
-                ? "https://rest.prod.bladewallet.io/openapi/v7"
-                : "https://api.bld-dev.bladewallet.io/openapi/v7"
+                ? $"https://rest.prod.bladewallet.io/openapi{publicPath}/v7"
+                : $"https://api.bld-dev.bladewallet.io/openapi{publicPath}/v7"
             ;
 
             return host + route;
@@ -125,11 +126,27 @@ namespace BladeLabs.UnitySDK
                     httpClient.DefaultRequestHeaders.Add("X-DAPP-CODE", this.dAppCode);
                     httpClient.DefaultRequestHeaders.Add("X-SDK-TVTE-API", xTvteApiToken);
 
-                    HttpResponseMessage response = await httpClient.PatchAsync(getApiUrl($"/%%%%%%%%%%%%%  REGISTER VISIROR URL %%%%%%%%%%%%%%%%%%"), bodyContent);
-
+                    HttpResponseMessage response = await httpClient.PostAsync(getApiUrl($"/sdk/config/vte"), bodyContent);
                     string content = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode) {
                         return true;
+                    } else {
+                        Debug.Log($"HTTP Request Error registerVisitor: {response.StatusCode} {content}");
+                        throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
+                    }
+                } catch (HttpRequestException ex) {
+                    throw new BladeSDKException($"HttpRequestException", ex.Message);
+                }
+            }
+        }
+
+        public async Task<string> getNodeId() {
+            using (HttpClient httpClient = new HttpClient()) {
+                try {
+                    HttpResponseMessage response = await httpClient.GetAsync(getApiUrl($"/hedera/nodes", true));
+                    string content = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode) {
+                        return StringUtils.readNodeIdFromRawJson(content, this.network.ToString().ToUpper());
                     } else {
                         throw new BladeSDKException($"HTTP Request Error: {response.StatusCode}", content);
                     }
@@ -345,7 +362,7 @@ namespace BladeLabs.UnitySDK
                     };
                     string body = JsonUtility.ToJson(request);
                     HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await httpClient.PostAsync(getSdkApi("/signer/tx"), bodyContent);
+                    HttpResponseMessage response = await httpClient.PostAsync(getSdkApi("/execute/tx"), bodyContent);
                     string content = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode) {
                         var responseObject = JsonUtility.FromJson<ExecuteTxReceipt>(content);
@@ -365,7 +382,7 @@ namespace BladeLabs.UnitySDK
                 try {
                     string body = JsonUtility.ToJson(delayedQueryCall);
                     HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await httpClient.PostAsync(getSdkApi("/signer/query"), bodyContent);
+                    HttpResponseMessage response = await httpClient.PostAsync(getSdkApi("/execute/query"), bodyContent);
                     string content = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode) {
                         var responseObject = JsonUtility.FromJson<DelayedQueryCallResult>(content);

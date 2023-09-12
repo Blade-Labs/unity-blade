@@ -14,11 +14,8 @@ using System.Web;
         - no `getKeysFromMnemonic` method
         - `createAccount` not returning mnemonic
 
-    TODO: [backend] alternative to visitorId
-    TODO: [backend] get from BladeConfig nodeAccountId = "0.0.3";
     TODO: [backend] contractCallQueryFunction free calls
     TODO: e2e test
-    TODO: [postponed] getPendingAccount(transactionId: string, mnemonic: string)
 */
         
 namespace BladeLabs.UnitySDK
@@ -31,7 +28,7 @@ namespace BladeLabs.UnitySDK
         private Network network = Network.Testnet;
         string dAppCode;
         private SdkEnvironment sdkEnvironment;
-        string sdkVersion = "Swift@0.6.0"; // "Unity@0.6.0";
+        string sdkVersion = "Unity@0.6.4";
         string visitorId;
         private string executeApiEndpoint;
         
@@ -59,7 +56,7 @@ namespace BladeLabs.UnitySDK
 
             string vteToken = this.getEncryptedHeader(EncryptedType.vte);
             string tvteToken = this.getEncryptedHeader(EncryptedType.tvte);
-        
+
             apiService.registerVisitor(vteToken, tvteToken);
         }
 
@@ -217,7 +214,7 @@ namespace BladeLabs.UnitySDK
             List<string> returnTypes
         ) {
             if (fee > 0) {
-                string nodeAccountId = "0.0.3";            
+                string nodeAccountId = await apiService.getNodeId();
                 string delayedQueryCallResponse = engine
                     .Evaluate($"window.bladeSdk.contractCallQueryFunction('{contractId}', '{functionName}', '{parameters.encode()}', '{accountId}', '{accountPrivateKey}', {gas}, {fee}, '{nodeAccountId}')")
                     .UnwrapIfPromise()
