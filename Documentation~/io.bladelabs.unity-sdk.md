@@ -47,10 +47,9 @@ class YourProjectClass : MonoBehaviour {
     private string apiKey = "ygUgCzRrs_yourDAppApiKey_5m8FjfPV3XVUeB";
     private Network network = Network.Testnet;
     private string dAppCode = "unitysdktest";
-    private string executeEndpoint = "http://localhost:8443";
 
     async void Start() {
-        BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, SdkEnvironment.CI, executeEndpoint);
+        BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, SdkEnvironment.CI);
 
         // After init you can call any public method, e.g.:
         Debug.Log(

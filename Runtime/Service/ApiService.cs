@@ -10,20 +10,14 @@ namespace BladeLabs.UnitySDK
     public class ApiService {
         private Network network;
         private SdkEnvironment sdkEnvironment;
-        private string executeApiEndpoint;
         private string visitorId;
         private string dAppCode;
 
-        public ApiService(Network network, SdkEnvironment sdkEnvironment, string executeApiEndpoint, string dAppCode, string visitorId) {
+        public ApiService(Network network, SdkEnvironment sdkEnvironment, string dAppCode, string visitorId) {
             this.network = network;
             this.sdkEnvironment = sdkEnvironment;
-            this.executeApiEndpoint = executeApiEndpoint;
             this.visitorId = visitorId;
             this.dAppCode = dAppCode;
-        }
-
-        private string getSdkApi(string route) {
-            return this.executeApiEndpoint + route;
         }
 
         private string getApiUrl(string route, bool isPublic = false) {
@@ -353,16 +347,22 @@ namespace BladeLabs.UnitySDK
             };
         }
 
-        public async Task<ExecuteTxReceipt> executeTx(string tx, string network) {
+        public async Task<ExecuteTxReceipt> executeTx(string tx, string xTvteApiToken) {
             using (HttpClient httpClient = new HttpClient()) {
                 try {
                     ExecuteTxRequest request = new ExecuteTxRequest {
                         tx = tx,
-                        network = network
+                        network = this.network.ToString().ToUpper()
                     };
                     string body = JsonUtility.ToJson(request);
                     HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await httpClient.PostAsync(getSdkApi("/execute/tx"), bodyContent);
+                    
+                    httpClient.DefaultRequestHeaders.Add("X-NETWORK", this.network.ToString().ToUpper());
+                    httpClient.DefaultRequestHeaders.Add("X-VISITOR-ID", this.visitorId);
+                    httpClient.DefaultRequestHeaders.Add("X-DAPP-CODE", this.dAppCode);
+                    httpClient.DefaultRequestHeaders.Add("X-SDK-TVTE-API", xTvteApiToken);
+
+                    HttpResponseMessage response = await httpClient.PostAsync(getApiUrl($"/sdk/exec/execute/tx"), bodyContent);
                     string content = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode) {
                         var responseObject = JsonUtility.FromJson<ExecuteTxReceipt>(content);
@@ -377,13 +377,20 @@ namespace BladeLabs.UnitySDK
         }
 
         
-        public async Task<DelayedQueryCallResult> executeDelayedQueryCall(DelayedQueryCall delayedQueryCall) {
+        public async Task<DelayedQueryCallResult> executeDelayedQueryCall(DelayedQueryCall delayedQueryCall, string xTvteApiToken) {
             using (HttpClient httpClient = new HttpClient()) {
                 try {
                     string body = JsonUtility.ToJson(delayedQueryCall);
                     HttpContent bodyContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await httpClient.PostAsync(getSdkApi("/execute/query"), bodyContent);
+
+                    httpClient.DefaultRequestHeaders.Add("X-NETWORK", this.network.ToString().ToUpper());
+                    httpClient.DefaultRequestHeaders.Add("X-VISITOR-ID", this.visitorId);
+                    httpClient.DefaultRequestHeaders.Add("X-DAPP-CODE", this.dAppCode);
+                    httpClient.DefaultRequestHeaders.Add("X-SDK-TVTE-API", xTvteApiToken);
+
+                    HttpResponseMessage response = await httpClient.PostAsync(getApiUrl($"/sdk/exec/execute/query"), bodyContent);
                     string content = await response.Content.ReadAsStringAsync();
+
                     if (response.IsSuccessStatusCode) {
                         var responseObject = JsonUtility.FromJson<DelayedQueryCallResult>(content);
                         return responseObject;

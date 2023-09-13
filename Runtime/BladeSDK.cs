@@ -30,17 +30,15 @@ namespace BladeLabs.UnitySDK
         private SdkEnvironment sdkEnvironment;
         string sdkVersion = "Unity@0.6.4";
         string visitorId;
-        private string executeApiEndpoint;
         
-        public BladeSDK(string apiKey, Network network, string dAppCode, SdkEnvironment sdkEnvironment, string executeApiEndpoint = "http://localhost:8443") {
+        public BladeSDK(string apiKey, Network network, string dAppCode, SdkEnvironment sdkEnvironment) {
             this.apiKey = apiKey;
             this.network = network;
             this.dAppCode = dAppCode;
             this.sdkEnvironment = sdkEnvironment;
-            this.executeApiEndpoint = executeApiEndpoint;
             this.visitorId = SystemInfo.deviceUniqueIdentifier;
 
-            this.apiService = new ApiService(network, sdkEnvironment, executeApiEndpoint, dAppCode, this.visitorId);
+            this.apiService = new ApiService(network, sdkEnvironment, dAppCode, this.visitorId);
 
             engine = new Engine();
             engine.SetValue("console",typeof(Debug));
@@ -93,7 +91,8 @@ namespace BladeLabs.UnitySDK
                 .ToString();
 
             SignedTx signedTx = this.processResponse<SignedTx>(response);
-            return await apiService.executeTx(signedTx.tx, signedTx.network);
+            string tvteToken = this.getEncryptedHeader();
+            return await apiService.executeTx(signedTx.tx, tvteToken);
         }
 
         public async Task<ExecuteTxReceipt> transferTokens(string tokenId, string accountId, string accountPrivateKey, string recieverAccount, string amount, string memo, bool freeTransfer = false) {
@@ -116,7 +115,7 @@ namespace BladeLabs.UnitySDK
                 SignedTx signedTx = this.signTransaction(freeTokenTransferResponse.transactionBytes, "base64", accountPrivateKey);
 
                 //send tx to execution
-                return await apiService.executeTx(signedTx.tx, signedTx.network);
+                return await apiService.executeTx(signedTx.tx, tvteToken);
             } else {
                 string response = engine
                     .Evaluate($"window.bladeSdk.transferTokens('{tokenId}', '{accountId}', '{accountPrivateKey}', '{recieverAccount}', {correctedAmount}, '{memo}')")
@@ -124,7 +123,8 @@ namespace BladeLabs.UnitySDK
                     .ToString();
 
                 SignedTx signedTx = this.processResponse<SignedTx>(response);
-                return await apiService.executeTx(signedTx.tx, signedTx.network);
+                string tvteToken = this.getEncryptedHeader();
+                return await apiService.executeTx(signedTx.tx, tvteToken);
             }
         }
 
@@ -142,7 +142,7 @@ namespace BladeLabs.UnitySDK
             // sign and execute transactions if any
             if (createAccountResponse.updateAccountTransactionBytes != null) {
                 SignedTx signedTx = this.signTransaction(createAccountResponse.updateAccountTransactionBytes, "base64", keyPairData.privateKey);
-                ExecuteTxReceipt executeTxReceipt = await apiService.executeTx(signedTx.tx, signedTx.network);
+                ExecuteTxReceipt executeTxReceipt = await apiService.executeTx(signedTx.tx, tvteToken);
                 // confirm account key update
                 if (executeTxReceipt.status == "SUCCESS") {
                     await apiService.confirmAccountUpdate(createAccountResponse.id, tvteToken);
@@ -151,7 +151,7 @@ namespace BladeLabs.UnitySDK
 
             if (createAccountResponse.transactionBytes != null) {
                 SignedTx signedTx = this.signTransaction(createAccountResponse.transactionBytes, "base64", keyPairData.privateKey);
-                ExecuteTxReceipt executeTxReceipt = await apiService.executeTx(signedTx.tx, signedTx.network);
+                ExecuteTxReceipt executeTxReceipt = await apiService.executeTx(signedTx.tx, tvteToken);
             }
 
             CreateAccountData createAccountData = new CreateAccountData {
@@ -172,7 +172,9 @@ namespace BladeLabs.UnitySDK
                 .UnwrapIfPromise()
                 .ToString();
             SignedTx signedTx = this.processResponse<SignedTx>(signedTxResponse);
-            return await apiService.executeTx(signedTx.tx, signedTx.network);
+            string tvteToken = this.getEncryptedHeader();
+            return await apiService.executeTx(signedTx.tx, tvteToken);
+
         }
 
         public async Task<ExecuteTxReceipt> contractCallFunction(string contractId, string functionName, ContractFunctionParameters parameters, string accountId, string accountPrivateKey, uint gas, bool bladePayFee = false) {
@@ -192,14 +194,16 @@ namespace BladeLabs.UnitySDK
                     false
                 );
                 SignedTx signedTx = this.signTransaction(signContractCallResponse.transactionBytes, "base64", accountPrivateKey);
-                return await apiService.executeTx(signedTx.tx, signedTx.network);
+                string tvteToken = this.getEncryptedHeader();
+                return await apiService.executeTx(signedTx.tx, tvteToken);
             } else {
                 string signedTxResponse = engine
                     .Evaluate($"window.bladeSdk.contractCallFunctionTransaction('{contractId}', '{functionName}', '{parameters.encode()}', '{accountId}', '{accountPrivateKey}', {gas})")
                     .UnwrapIfPromise()
                     .ToString();
                 SignedTx signedTx = this.processResponse<SignedTx>(signedTxResponse);
-                return await apiService.executeTx(signedTx.tx, signedTx.network);
+                string tvteToken = this.getEncryptedHeader();
+                return await apiService.executeTx(signedTx.tx, tvteToken);
             }
         }
 
@@ -221,7 +225,8 @@ namespace BladeLabs.UnitySDK
                     .ToString();
                 DelayedQueryCall delayedQueryCall = this.processResponse<DelayedQueryCall>(delayedQueryCallResponse);
                 
-                DelayedQueryCallResult delayedQueryCallResult = await apiService.executeDelayedQueryCall(delayedQueryCall);
+                string tvteToken = this.getEncryptedHeader();
+                DelayedQueryCallResult delayedQueryCallResult = await apiService.executeDelayedQueryCall(delayedQueryCall, tvteToken);
                 
                 string contractCallQueryResponse = engine
                     .Evaluate($"window.bladeSdk.parseContractCallQueryResponse('{contractId}', '{delayedQueryCallResult.contractFunctionResult.gasUsed}', '{delayedQueryCallResult.rawResult}', ['{string.Join("', '", returnTypes)}'])")

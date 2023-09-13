@@ -16,11 +16,10 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
     /// </summary>
     public class BladeSDKTests
     {
-        string apiKey = "ygUgCzRrsvhWmb3dsLcDpGnJpSZ4tk8hACmZqg9WngpuQYKdnD5m8FjfPV3XVUeB";
+        string apiKey = "Rww3x27z3Q9rrIvRQ6qGgIRppxz5e5HHPWdARyxnMXpe77WD5MW39REBXXvRZsZE";
         Network network = Network.Testnet;
         string dAppCode = "unitysdktest";
         SdkEnvironment sdkEnvironment = SdkEnvironment.CI;
-        string executeApiEndpoint = "http://localhost:8443";
         string accountId0 = "0.0.346533";
         string accountId0Private = "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b";
         string accountId0Public = "302d300706052b8104000a032200029dc73991b0d9cdbb59b2cd0a97a0eaff6de801726cb39804ea9461df6be2dd30";
@@ -36,7 +35,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator GetInfo() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task =  bladeSdk.getInfo();
             while (!task.IsCompleted) {
                 yield return null; // Wait for the next frame
@@ -52,7 +51,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator GetAccountInfo() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.getAccountInfo(accountId0);
             while (!task.IsCompleted) {
                 yield return null;
@@ -66,7 +65,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator GetBalance() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.getBalance(accountId0);
             while (!task.IsCompleted) {
                 yield return null;
@@ -79,7 +78,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator TransferHbars() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.transferHbars(
                 accountId0,
                 accountId0Private,
@@ -97,7 +96,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator TransferTokens() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.transferTokens(
                 token1,
                 accountId0,
@@ -118,7 +117,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator TransferTokensNoFee() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.transferTokens(
                 token0DApp, /// token id assigned on server side for dAppCode
                 accountId0,
@@ -140,7 +139,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
         [UnityTest]
         public IEnumerator CreateAndDeleteAccount() {
             bool status = true;
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.createAccount("some device id, if configured");
 
             while (!task.IsCompleted) {
@@ -170,7 +169,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator ContractCallFunction() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
 
             ContractFunctionParameters parameters = new ContractFunctionParameters().addString("Hello Unity SDK [tests]");
             var task = bladeSdk.contractCallFunction(
@@ -192,7 +191,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator ContractCallFunctionNoFee() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
 
             ContractFunctionParameters parameters = new ContractFunctionParameters().addString("Hello Unity SDK [tests no fee]");
             var task = bladeSdk.contractCallFunction(
@@ -215,7 +214,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator ContractCallQueryFunction() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.contractCallQueryFunction(
                 contractId,
                 "get_message", 
@@ -236,7 +235,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator GetC14Url() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.getC14url(
                 "HBAR",
                 accountId0, 
@@ -254,7 +253,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
             var signature = "27cb9d51434cf1e76d7ac515b19442c619f641e6fccddbf4a3756b14466becb6992dc1d2a82268018147141fc8d66ff9ade43b7f78c176d070a66372d655f942";
 
 
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var taskSign1 = bladeSdk.sign("hello", accountId0Private, "utf8");
             while (!taskSign1.IsCompleted) {
                 yield return null;
@@ -293,7 +292,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
         public IEnumerator HethersSign() {
             var signature = "0x25de7c26ecfa4f28d8b96a95cf58ea7088a72a66b311c796090cb4c7d58c11217b4a7b174b4c31b90c3babb00958b2120274380404c4f1196abe3614df3741561b";
 
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var taskSign1 = bladeSdk.hethersSign("hello", accountId0Private, "utf8");
             while (!taskSign1.IsCompleted) {
                 yield return null;
@@ -307,7 +306,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
         public IEnumerator SplitSignature() {
             var signature = "0x25de7c26ecfa4f28d8b96a95cf58ea7088a72a66b311c796090cb4c7d58c11217b4a7b174b4c31b90c3babb00958b2120274380404c4f1196abe3614df3741561b";
 
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.splitSignature(signature);
             while (!task.IsCompleted) {
                 yield return null;
@@ -322,7 +321,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator GetParamsSignature() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
 
             ContractFunctionParameters parameters = new ContractFunctionParameters()
                 .addAddress(accountId0)
@@ -345,7 +344,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
 
         [UnityTest]
         public IEnumerator GetTransactions() {
-            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment, executeApiEndpoint);
+            BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
 
             var task = bladeSdk.getTransactions(accountId0, "CRYPTOTRANSFER", "", 5);
             while (!task.IsCompleted) {
