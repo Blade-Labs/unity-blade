@@ -23,10 +23,3 @@ To update JS bundle do this:
 
 Also for local development you can set output of webpack directly to Plugin directory. 
 To do that, in `./config/webpack.unity.js` set `output.path` to something similar to that `'/Users/gary/dev/unity/io.bladelabs.unity-sdk/Resources'`
-
-### Backend for executing transactions 
-
-Currently this is not part of BladeAPI, maybe in future
-
-Check example of [transaction executor endpoint](tx-executor/index.js)
-
