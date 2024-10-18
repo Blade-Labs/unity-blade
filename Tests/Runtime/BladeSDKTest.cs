@@ -20,16 +20,16 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
         Network network = Network.Testnet;
         string dAppCode = "unitysdktest";
         SdkEnvironment sdkEnvironment = SdkEnvironment.CI;
-        string accountId0 = "0.0.346533";
+        string accountId0 = "0.0.1443";
         string accountId0Private = "3030020100300706052b8104000a04220420ebccecef769bb5597d0009123a0fd96d2cdbe041c2a2da937aaf8bdc8731799b";
         string accountId0Public = "302d300706052b8104000a032200029dc73991b0d9cdbb59b2cd0a97a0eaff6de801726cb39804ea9461df6be2dd30";
 
-        string accountId1 = "0.0.346530";
+        string accountId1 = "0.0.1881";
 
-        string token0DApp = "0.0.433870";
-        string token1 = "0.0.416487";
+        string token0DApp = "0.0.2216053";
+        string token1 = "0.0.5449";
 
-        string contractId = "0.0.416245";
+        string contractId = "0.0.4437600";
 
         // Assert.AreEqual("", info.sdkVersion, "OMG! Hack instead of Debug.Log" );
 
@@ -98,7 +98,7 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
         public IEnumerator TransferTokens() {
             BladeSDK bladeSdk = new BladeSDK(apiKey, network, dAppCode, sdkEnvironment);
             var task = bladeSdk.transferTokens(
-                token1,
+                token0DApp,
                 accountId0,
                 accountId0Private,
                 accountId1,
@@ -336,9 +336,9 @@ namespace BladeLabs.UnitySDK.Tests.Runtime
             }
             SplitSignatureData splitSignatureData = task.Result;
 
-            Assert.AreEqual(true, splitSignatureData.v == 28
-                                    && splitSignatureData.r == "0xe5e662d0564828fd18b2b5b228ade288ad063fadca76812f7902f56cae3e678e"
-                                    && splitSignatureData.s == "0x61b7ceb82dc6695872289b697a1bca73b81c494288abda29fa022bb7b80c84b5"
+            Assert.AreEqual(true, splitSignatureData.v == 27
+                                    && splitSignatureData.r == "0x0c6e8f0487709cfc1ebbc41e47ce56aee5cf5bc933a4cd6cb2695b098dbe4ee4"
+                                    && splitSignatureData.s == "0x22d0b6351670c37eb112ebd80123452237cb5c893767510a9356214189f6fe86"
             );
         }
 
