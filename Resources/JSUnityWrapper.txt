@@ -186839,19 +186839,23 @@ var BladeUnitySDK = /** @class */ (function () {
     };
     BladeUnitySDK.prototype.hethersSign = function (messageString, privateKey, encoding) {
         return unity_awaiter(this, void 0, void 0, function () {
-            var wallet, signedMessage;
+            var wallet, signedMessage, error_10;
             return unity_generator(this, function (_a) {
-                try {
-                    wallet = new lib_esm_Wallet(privateKey);
-                    signedMessage = wallet.signMessage(node_modules_buffer.Buffer.from(messageString, encoding));
-                    return [2 /*return*/, this.sendMessageToNative({
-                            signedMessage: signedMessage
-                        })];
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        wallet = new lib_esm_Wallet(src_PrivateKey_PrivateKey.fromStringDer(privateKey).toStringRaw());
+                        return [4 /*yield*/, wallet.signMessage(node_modules_buffer.Buffer.from(messageString, encoding))];
+                    case 1:
+                        signedMessage = _a.sent();
+                        return [2 /*return*/, this.sendMessageToNative({
+                                signedMessage: signedMessage
+                            })];
+                    case 2:
+                        error_10 = _a.sent();
+                        return [2 /*return*/, this.sendMessageToNative(null, error_10)];
+                    case 3: return [2 /*return*/];
                 }
-                catch (error) {
-                    return [2 /*return*/, this.sendMessageToNative(null, error)];
-                }
-                return [2 /*return*/];
             });
         });
     };
@@ -186872,7 +186876,7 @@ var BladeUnitySDK = /** @class */ (function () {
     };
     BladeUnitySDK.prototype.getParamsSignature = function (paramsEncoded, privateKey) {
         return unity_awaiter(this, void 0, void 0, function () {
-            var _a, types, values, hash, messageHashBytes, wallet, signed, _b, v, r, s, error_10;
+            var _a, types, values, hash, messageHashBytes, wallet, signed, _b, v, r, s, error_11;
             return unity_generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
@@ -186882,15 +186886,15 @@ var BladeUnitySDK = /** @class */ (function () {
                         _a = _c.sent(), types = _a.types, values = _a.values;
                         hash = lib_esm_keccak256(defaultAbiCoder.encode(types, values));
                         messageHashBytes = lib_esm_arrayify(hash);
-                        wallet = new lib_esm_Wallet(privateKey);
+                        wallet = new lib_esm_Wallet(src_PrivateKey_PrivateKey.fromStringDer(privateKey).toStringRaw());
                         return [4 /*yield*/, wallet.signMessage(messageHashBytes)];
                     case 2:
                         signed = _c.sent();
                         _b = lib_esm_splitSignature(signed), v = _b.v, r = _b.r, s = _b.s;
                         return [2 /*return*/, this.sendMessageToNative({ v: v, r: r, s: s })];
                     case 3:
-                        error_10 = _c.sent();
-                        return [2 /*return*/, this.sendMessageToNative(null, error_10)];
+                        error_11 = _c.sent();
+                        return [2 /*return*/, this.sendMessageToNative(null, error_11)];
                     case 4: return [2 /*return*/];
                 }
             });
