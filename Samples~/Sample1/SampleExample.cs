@@ -11,7 +11,7 @@ namespace BladeLabs.UnitySDK.Samples
             BladeSDK bladeSdk = new BladeSDK("Rww3x27z3Q9rrIvRQ6qGgIRppxz5e5HHPWdARyxnMXpe77WD5MW39REBXXvRZsZE", Network.Testnet, "unitysdktest", SdkEnvironment.CI);
 
             // get info
-            // Debug.Log(await bladeSdk.getInfo());
+            Debug.Log(await bladeSdk.getInfo());
 
             // get account info
             // Debug.Log(await bladeSdk.getAccountInfo("0.0.346533"));

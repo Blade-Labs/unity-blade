@@ -384,7 +384,7 @@ namespace BladeLabs.UnitySDK
             BladeJSError error = (BladeJSError)response.error;
 
             if (error.name != null || error.reason != null) {
-                Debug.Log($"processResponse() throwing BladeSDKException({error.name}, {error.reason})");
+                Debug.Log($"processResponse() throwing BladeSDKException({error.name}, {error.reason})\n\n\n{rawJson}");
                 throw new BladeSDKException(error.name, error.reason);
             }
 
